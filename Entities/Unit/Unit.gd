@@ -1,0 +1,177 @@
+class_name Unit
+extends Node2D
+
+signal hp_changed(old_hp: int, new_hp: int)
+signal unit_died()
+signal grid_position_changed(new_pos: Vector2i)
+
+var unit_data: UnitData
+
+@export var unit_name: String = "Unit"
+@export var team: int = 0           # 0 = player, 1 = enemy
+@export var max_hp: int = 20
+@export var max_action_points: int = 2
+@export var move_points: int = 4
+@export var attack_range: int = 1
+@export var attack_damage: int = 5
+
+# Turn state — reset each turn
+var action_points: int = 0
+var has_moved: bool = false
+var has_acted: bool = false
+var has_waited: bool = false
+
+# Persistent state
+var current_hp: int = 0
+var grid_position: Vector2i = Vector2i.ZERO
+
+var _sprite: Sprite2D
+var _status_receiver: StatusEffectReceiver
+var _hook_index: Dictionary = {}
+
+func _ready() -> void:
+	current_hp = max_hp
+	action_points = max_action_points
+	add_to_group("units")
+	_sprite = Sprite2D.new()
+	add_child(_sprite)
+	_status_receiver = StatusEffectReceiver.new()
+	add_child(_status_receiver)
+	_rebuild_hook_index()
+
+func get_status_receiver() -> StatusEffectReceiver:
+	return _status_receiver
+
+func set_sprite_texture(texture: Texture2D) -> void:
+	_sprite.texture = texture
+
+func set_sprite_atlas(texture: Texture2D, region: Rect2) -> void:
+	var atlas := AtlasTexture.new()
+	atlas.atlas = texture
+	atlas.region = region
+	_sprite.texture = atlas
+
+# --- Grid position ---
+
+func set_grid_position(pos: Vector2i) -> void:
+	grid_position = pos
+	grid_position_changed.emit(pos)
+
+# --- Turn state ---
+
+func reset_turn() -> void:
+	action_points = max_action_points
+	has_moved = false
+	has_acted = false
+	has_waited = false
+	_status_receiver.tick_and_expire(self)
+
+# --- Actions ---
+
+func get_available_actions() -> Array[BaseAction]:
+	var all: Array[BaseAction] = _build_action_list()
+	var available: Array[BaseAction] = []
+	for action in all:
+		if action.can_execute(self):
+			available.append(action)
+	return available
+
+func _build_action_list() -> Array[BaseAction]:
+	if unit_data == null or unit_data.actions.is_empty():
+		return []
+	var result: Array[BaseAction] = []
+	result.assign(unit_data.actions)
+	return result
+
+func get_reactions() -> Array[BaseReaction]:
+	if unit_data == null:
+		return []
+	var result: Array[BaseReaction] = []
+	result.assign(unit_data.reactions)
+	return result
+
+# --- HP / damage ---
+
+func take_damage(amount: int) -> void:
+	var actual := amount
+	if has_status("guarding"):
+		actual = max(1, amount / 2)
+
+	var old_hp := current_hp
+	current_hp = max(0, current_hp - actual)
+	hp_changed.emit(old_hp, current_hp)
+
+	if current_hp == 0:
+		unit_died.emit()
+		_on_death()
+
+func heal(amount: int) -> void:
+	var old_hp := current_hp
+	current_hp = min(max_hp, current_hp + amount)
+	hp_changed.emit(old_hp, current_hp)
+
+func is_alive() -> bool:
+	return current_hp > 0
+
+# --- Status effects ---
+
+func apply_status(status_id: StringName, turns: int = 1) -> void:
+	var effect := StatusEffect.new()
+	effect.status_id = status_id
+	effect.duration = turns
+	_status_receiver.apply(effect)
+
+func has_status(status_id: StringName) -> bool:
+	return _status_receiver.has_effect(status_id)
+
+func remove_status(status_id: StringName) -> void:
+	_status_receiver.remove_effect(status_id)
+
+func _on_death() -> void:
+	if is_instance_valid(_sprite):
+		_sprite.modulate = Color(0.4, 0.4, 0.4, 0.6)
+	modulate = Color(0.5, 0.5, 0.5, 0.7)
+
+# --- Passive hook registry ---
+
+func _rebuild_hook_index() -> void:
+	_hook_index.clear()
+	if unit_data == null:
+		return
+	for passive in unit_data.passives:
+		for hook_id: StringName in passive.get_hook_ids():
+			if not _hook_index.has(hook_id):
+				_hook_index[hook_id] = []
+			_hook_index[hook_id].append(passive)
+
+func fire_hook(hook_id: StringName, ctx: PassiveContext) -> void:
+	for passive in _hook_index.get(hook_id, []):
+		(passive as BasePassive).handle_hook(hook_id, ctx)
+
+func get_effective_move_points() -> int:
+	var ctx := MoveQueryContext.new()
+	fire_hook(&"get_move_points", ctx)
+	return move_points + ctx.bonus_move_points
+
+func get_effective_attack_range(base: int) -> int:
+	var ctx := AttackRangeQueryContext.new()
+	fire_hook(&"get_attack_range", ctx)
+	return base + ctx.bonus_range
+
+## Shows the icon of every passive registered for hook_id above the unit.
+## Call this at the moment the hook's effect actually matters (e.g. move execution).
+func show_active_hook_icons(hook_id: StringName) -> void:
+	for passive in _hook_index.get(hook_id, []):
+		_show_passive_activation(passive as BasePassive)
+
+func _show_passive_activation(passive: BasePassive) -> void:
+	if passive == null or passive.icon == null:
+		return
+	var sprite := Sprite2D.new()
+	sprite.texture = passive.icon
+	sprite.position = Vector2(0, -40)
+	add_child(sprite)
+	var tween := create_tween()
+	tween.tween_property(sprite, "position:y", -64.0, 0.8)
+	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.8)
+	tween.tween_callback(sprite.queue_free)

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dbucmhv3di6b7"]
+
+[ext_resource type="Script" uid="uid://cyuiqjuev7a7s" path="res://Entities/Unit/UnitData.gd" id="1"]
+[ext_resource type="Script" uid="uid://d330klun4itwp" path="res://Systems/Action/Base/BaseAction.gd" id="1_1f52h"]
+[ext_resource type="Script" uid="uid://db3cq66lvdr5d" path="res://Systems/Action/Actions/MoveAction.gd" id="2"]
+[ext_resource type="Script" uid="uid://brabtc6hwva8f" path="res://Systems/Action/Actions/AttackAction.gd" id="3"]
+[ext_resource type="Script" uid="uid://djce20wfimobh" path="res://Systems/Reaction/BaseReaction.gd" id="4_28m1t"]
+
+[sub_resource type="Resource" id="Resource_1f52h"]
+script = ExtResource("3")
+metadata/_custom_type_script = "uid://brabtc6hwva8f"
+
+[sub_resource type="Resource" id="Resource_28m1t"]
+script = ExtResource("2")
+metadata/_custom_type_script = "uid://db3cq66lvdr5d"
+
+[resource]
+script = ExtResource("1")
+unit_name = "Bandit"
+max_hp = 18
+move_points = 3
+atlas_cell = Vector2i(4, 0)
+actions = Array[ExtResource("1_1f52h")]([SubResource("Resource_1f52h"), SubResource("Resource_28m1t")])

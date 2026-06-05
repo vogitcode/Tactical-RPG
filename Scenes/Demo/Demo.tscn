@@ -1,0 +1,148 @@
+[gd_scene format=3 uid="uid://ejbodhxhuxwk"]
+
+[ext_resource type="Script" uid="uid://cn6663rqd6ctj" path="res://Scenes/Demo/GameLoop.gd" id="1"]
+[ext_resource type="Script" uid="uid://d2hsh67f6mwnf" path="res://Scenes/Demo/SystemManager.gd" id="2"]
+[ext_resource type="Script" uid="uid://4eytyuk6fvc" path="res://Systems/Grid/GridSystem.gd" id="3"]
+[ext_resource type="Script" uid="uid://bbi68sc2bfof" path="res://Systems/Turn/TurnSystem.gd" id="4"]
+[ext_resource type="Script" uid="uid://ekyvs44d83af" path="res://Systems/Action/ActionSystem.gd" id="5"]
+[ext_resource type="Script" uid="uid://bqpfvu6mq4vba" path="res://Systems/Reaction/ReactionSystem.gd" id="6"]
+[ext_resource type="Script" uid="uid://cbyk0hi1f0fwx" path="res://Systems/Action/UI/ActionMenu.gd" id="7"]
+[ext_resource type="Script" uid="uid://cxesxfp4glcyn" path="res://Systems/Move/MoveSystem.gd" id="8"]
+[ext_resource type="Script" uid="uid://byhpl1p7t6vee" path="res://Systems/Input/InputSystem.gd" id="9"]
+[ext_resource type="Script" uid="uid://bsing2rwo7cuc" path="res://Entities/Unit/UnitManager.gd" id="10"]
+[ext_resource type="Script" uid="uid://b16cgn24l2p42" path="res://Systems/Action/Executor/InterruptManager.gd" id="11"]
+[ext_resource type="Script" uid="uid://cwexjgvwqdu1g" path="res://UI/ScreenUIManager.gd" id="13"]
+[ext_resource type="Script" uid="uid://dwp3n1tpe1jfv" path="res://UI/HealthUIManager.gd" id="14"]
+[ext_resource type="Script" uid="uid://nbkddo17rjuc" path="res://Systems/Grid/Visual/GridVisualizer.gd" id="15"]
+[ext_resource type="Script" uid="uid://cik4owlj6iepl" path="res://Systems/Turn/States/BattleStartState.gd" id="16"]
+[ext_resource type="Script" uid="uid://c11nauitphmob" path="res://Systems/Turn/States/TurnStartState.gd" id="17"]
+[ext_resource type="Script" uid="uid://dqsse2va2iidc" path="res://Systems/Turn/States/FactionTurnStartState.gd" id="18"]
+[ext_resource type="Script" uid="uid://pptfpev8u7u3" path="res://Systems/Turn/States/UnitTurnStartState.gd" id="19"]
+[ext_resource type="Script" path="res://Systems/Battle/CombatSystem.gd" id="28_cs"]
+[ext_resource type="Script" path="res://Systems/Battle/ReactionCollector.gd" id="29_rc"]
+[ext_resource type="Script" path="res://Systems/Battle/Arbitrator.gd" id="30_arb"]
+[ext_resource type="Script" path="res://Systems/Battle/EffectExecutor.gd" id="31_ee"]
+[ext_resource type="Script" uid="uid://bwbwbwq8aafjx" path="res://Systems/Turn/States/UnitActingState.gd" id="20"]
+[ext_resource type="Script" uid="uid://c75uafi2jnasu" path="res://Systems/Turn/States/UnitTurnEndState.gd" id="21"]
+[ext_resource type="Script" uid="uid://dgjoudlreuos" path="res://Systems/Turn/States/FactionTurnEndState.gd" id="22"]
+[ext_resource type="Script" uid="uid://2jfbnlanhyck" path="res://Systems/Turn/States/TurnEndState.gd" id="23"]
+[ext_resource type="Script" uid="uid://6s4xynao8wvs" path="res://Systems/Turn/States/BattleEndState.gd" id="24"]
+[ext_resource type="Script" uid="uid://bwn7501jhsbm0" path="res://Systems/GameState/GoalSystem.gd" id="25"]
+[ext_resource type="Script" uid="uid://6vdx2jmrudv" path="res://Systems/TurnEffect/TurnEffectProcessor.gd" id="26"]
+[ext_resource type="Script" uid="uid://c3n0ltwuuycv0" path="res://Systems/ProcessControl/ProcessMonitor.gd" id="27"]
+[ext_resource type="Script" path="res://Systems/AI/AISystem.gd" id="32_ai"]
+[ext_resource type="Script" path="res://Systems/AI/Brains/BanditBrain.gd" id="33_bb"]
+
+[node name="GameLoop" type="Node" unique_id=300000001]
+script = ExtResource("1")
+
+[node name="SystemManager" type="Node2D" parent="." unique_id=300000002]
+script = ExtResource("2")
+
+[node name="GridSystem" type="Node" parent="SystemManager" unique_id=1139422429]
+script = ExtResource("3")
+
+[node name="GridVisualizer" type="Node2D" parent="SystemManager/GridSystem" unique_id=200000010]
+script = ExtResource("15")
+
+[node name="TurnSystem" type="Node" parent="SystemManager" unique_id=1483074458]
+script = ExtResource("4")
+
+[node name="BattleStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000011]
+script = ExtResource("16")
+
+[node name="TurnStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000012]
+script = ExtResource("17")
+
+[node name="FactionTurnStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000013]
+script = ExtResource("18")
+
+[node name="UnitTurnStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000014]
+script = ExtResource("19")
+
+[node name="UnitActingState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000015]
+script = ExtResource("20")
+timeout_sec = 0.0
+
+[node name="UnitTurnEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000016]
+script = ExtResource("21")
+
+[node name="FactionTurnEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000017]
+script = ExtResource("22")
+
+[node name="TurnEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000018]
+script = ExtResource("23")
+
+[node name="BattleEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=200000019]
+script = ExtResource("24")
+
+[node name="ActionHolder" type="Node" parent="SystemManager" unique_id=200000001]
+
+[node name="ActionSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=680845633]
+script = ExtResource("5")
+
+[node name="InterruptManager" type="Node" parent="SystemManager/ActionHolder/ActionSystem" unique_id=200000005]
+script = ExtResource("11")
+
+[node name="MoveSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=200000002]
+script = ExtResource("8")
+
+[node name="CombatSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=2116007564]
+script = ExtResource("28_cs")
+
+[node name="ReactionCollector" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=300000011]
+script = ExtResource("29_rc")
+
+[node name="Arbitrator" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=300000012]
+script = ExtResource("30_arb")
+
+[node name="EffectExecutor" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=300000013]
+script = ExtResource("31_ee")
+
+[node name="ReactionSystem" type="Node" parent="SystemManager" unique_id=330078636]
+script = ExtResource("6")
+
+[node name="InputSystem" type="Node" parent="SystemManager" unique_id=200000003]
+script = ExtResource("9")
+
+[node name="UnitManager" type="Node" parent="SystemManager" unique_id=200000004]
+script = ExtResource("10")
+
+[node name="GoalSystem" type="Node" parent="SystemManager" unique_id=200000020]
+script = ExtResource("25")
+
+[node name="TurnEffectProcessor" type="Node" parent="SystemManager" unique_id=200000022]
+script = ExtResource("26")
+
+[node name="ProcessMonitor" type="Node" parent="SystemManager" unique_id=200000023]
+script = ExtResource("27")
+
+[node name="AISystem" type="Node" parent="SystemManager" unique_id=400000001]
+script = ExtResource("32_ai")
+
+[node name="BanditBrain" type="Node" parent="SystemManager/AISystem" unique_id=400000002]
+script = ExtResource("33_bb")
+faction_id = 1
+
+[node name="WorldUIManager" type="Node2D" parent="." unique_id=200000009]
+
+[node name="HealthUIManager" type="Node2D" parent="WorldUIManager" unique_id=200000008]
+script = ExtResource("14")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=413059175]
+
+[node name="ScreenUIManager" type="Node" parent="UI" unique_id=200000007]
+script = ExtResource("13")
+
+[node name="ActionMenu" type="Control" parent="UI/ScreenUIManager" unique_id=770996196]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("7")
+
+[node name="StatusLabel" type="Label" parent="UI" unique_id=1531989024]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 700.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 14
+text = "Turn: —"

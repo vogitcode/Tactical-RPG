@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://1on0b2pkd03w"]
+
+[ext_resource type="Script" uid="uid://cyuiqjuev7a7s" path="res://Entities/Unit/UnitData.gd" id="1"]
+[ext_resource type="Script" uid="uid://d330klun4itwp" path="res://Systems/Action/Base/BaseAction.gd" id="1_p1usx"]
+[ext_resource type="Script" uid="uid://db3cq66lvdr5d" path="res://Systems/Action/Actions/MoveAction.gd" id="2"]
+[ext_resource type="Script" uid="uid://brabtc6hwva8f" path="res://Systems/Action/Actions/AttackAction.gd" id="3"]
+[ext_resource type="Script" uid="uid://dnfeq3xpm1lsr" path="res://Systems/Action/Actions/WaitAction.gd" id="4"]
+[ext_resource type="Script" uid="uid://coi5uc1ftetq8" path="res://Systems/Action/Actions/EndTurnAction.gd" id="5"]
+[ext_resource type="Script" uid="uid://djce20wfimobh" path="res://Systems/Reaction/BaseReaction.gd" id="6"]
+[ext_resource type="Script" uid="uid://b86nueot48xir" path="res://Systems/Reaction/DodgeReaction.gd" id="7"]
+
+[sub_resource type="Resource" id="Resource_1"]
+script = ExtResource("2")
+
+[sub_resource type="Resource" id="Resource_2"]
+script = ExtResource("3")
+
+[sub_resource type="Resource" id="Resource_3"]
+script = ExtResource("4")
+
+[sub_resource type="Resource" id="Resource_4"]
+script = ExtResource("5")
+
+[sub_resource type="Resource" id="Resource_mmpcx"]
+script = ExtResource("7")
+base_rp = 6
+
+[resource]
+script = ExtResource("1")
+unit_name = "Rogue"
+max_hp = 15
+move_points = 5
+attack_damage = 4
+atlas_cell = Vector2i(3, 0)
+actions = Array[ExtResource("1_p1usx")]([SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4")])
+reactions = Array[ExtResource("6")]([SubResource("Resource_mmpcx")])
