@@ -22,6 +22,7 @@
 [ext_resource type="Script" path="res://Systems/Battle/ReactionCollector.gd" id="29_rc"]
 [ext_resource type="Script" path="res://Systems/Battle/Arbitrator.gd" id="30_arb"]
 [ext_resource type="Script" path="res://Systems/Battle/EffectExecutor.gd" id="31_ee"]
+[ext_resource type="Script" path="res://Systems/Battle/PassiveScanner.gd" id="32_ps"]
 [ext_resource type="Script" uid="uid://bwbwbwq8aafjx" path="res://Systems/Turn/States/UnitActingState.gd" id="20"]
 [ext_resource type="Script" uid="uid://c75uafi2jnasu" path="res://Systems/Turn/States/UnitTurnEndState.gd" id="21"]
 [ext_resource type="Script" uid="uid://dgjoudlreuos" path="res://Systems/Turn/States/FactionTurnEndState.gd" id="22"]
@@ -98,6 +99,9 @@ script = ExtResource("30_arb")
 
 [node name="EffectExecutor" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=300000013]
 script = ExtResource("31_ee")
+
+[node name="PassiveScanner" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=300000014]
+script = ExtResource("32_ps")
 
 [node name="ReactionSystem" type="Node" parent="SystemManager" unique_id=330078636]
 script = ExtResource("6")

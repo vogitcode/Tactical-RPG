@@ -28,6 +28,7 @@ var grid_position: Vector2i = Vector2i.ZERO
 var _sprite: Sprite2D
 var _status_receiver: StatusEffectReceiver
 var _hook_index: Dictionary = {}
+var _runtime_passives: Array[BasePassive] = []
 
 func _ready() -> void:
 	current_hp = max_hp
@@ -37,6 +38,8 @@ func _ready() -> void:
 	add_child(_sprite)
 	_status_receiver = StatusEffectReceiver.new()
 	add_child(_status_receiver)
+	if unit_data != null:
+		_runtime_passives.assign(unit_data.passives)
 	_rebuild_hook_index()
 
 func get_status_receiver() -> StatusEffectReceiver:
@@ -97,11 +100,25 @@ func take_damage(amount: int) -> void:
 	if has_status("guarding"):
 		actual = max(1, amount / 2)
 
+	var damage_ctx := TakeDamageContext.new()
+	damage_ctx.original_amount = amount
+	damage_ctx.modified_damage = actual
+	damage_ctx.unit = self
+	fire_hook(&"on_take_damage", damage_ctx)
+	actual = maxi(0, damage_ctx.modified_damage)
+
 	var old_hp := current_hp
 	current_hp = max(0, current_hp - actual)
 	hp_changed.emit(old_hp, current_hp)
 
 	if current_hp == 0:
+		var death_ctx := DeathCheckContext.new()
+		death_ctx.unit = self
+		fire_hook(&"on_death_check", death_ctx)
+		if death_ctx.prevent_death:
+			current_hp = 1
+			hp_changed.emit(0, 1)
+			return
 		unit_died.emit()
 		_on_death()
 
@@ -136,13 +153,17 @@ func _on_death() -> void:
 
 func _rebuild_hook_index() -> void:
 	_hook_index.clear()
-	if unit_data == null:
-		return
-	for passive in unit_data.passives:
+	for passive in _runtime_passives:
 		for hook_id: StringName in passive.get_hook_ids():
 			if not _hook_index.has(hook_id):
 				_hook_index[hook_id] = []
 			_hook_index[hook_id].append(passive)
+
+## Removes a passive at runtime (e.g. after single-use passives consume themselves).
+## Rebuilds the hook index automatically.
+func remove_passive(passive: BasePassive) -> void:
+	_runtime_passives.erase(passive)
+	_rebuild_hook_index()
 
 func fire_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 	for passive in _hook_index.get(hook_id, []):

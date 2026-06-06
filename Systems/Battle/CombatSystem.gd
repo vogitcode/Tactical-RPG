@@ -2,8 +2,7 @@
 ##
 ## Accepts CombatAction submissions, queues them, and drains sequentially.
 ## Child nodes hold each processing step:
-##   ReactionCollector → Arbitrator → EffectExecutor
-##   PassiveScanner (Phase 5 — not yet implemented)
+##   ReactionCollector → Arbitrator → EffectExecutor → PassiveScanner
 ##
 ## Queue management (_queue, _drain, _is_running, sequence_done) is internal.
 class_name CombatSystem
@@ -14,6 +13,7 @@ signal sequence_done
 @onready var _reaction_collector: ReactionCollector = $ReactionCollector
 @onready var _arbitrator: Arbitrator                 = $Arbitrator
 @onready var _effect_executor: EffectExecutor        = $EffectExecutor
+@onready var _passive_scanner: PassiveScanner        = $PassiveScanner
 
 var _grid_system: GridSystem = null
 var _queue: Array[BattleProcess] = []
@@ -46,12 +46,13 @@ func _drain() -> void:
 	while not _queue.is_empty():
 		var process: BattleProcess = _queue.pop_front()
 		_last_result = await _run_process(process)
-		# Phase 5: PassiveScanner will scan _last_result → enqueue triggered processes here
+		_passive_scanner.scan(process)
 	_is_running = false
 	sequence_done.emit()
 
 func _run_process(process: BattleProcess) -> ActionResult:
 	var condition := _arbitrator.resolve(process.action, process.source_unit, process.reaction, process.reactor_unit)
+	process.condition_result = condition
 	if not condition.initiator_hit():
 		await process.reaction.execute_async(process.reactor_unit)
 	return await _effect_executor.execute(process.action, process.source_unit, condition, _grid_system)

@@ -46,6 +46,7 @@ var faction_order: Array[int] = []
 
 var _units: Array[Unit] = []
 var _deferred_units: Array[Unit] = []
+var _completed_units: Array[Unit] = []
 var _battle_ending: bool = false
 var _battle_result: StringName = &""
 
@@ -66,6 +67,7 @@ func start_battle() -> void:
 	_battle_ending = false
 	_battle_result = &""
 	_deferred_units = []
+	_completed_units = []
 	current_turn = 0
 	_set_state(BattleState.BATTLE_START)
 	battle_started.emit()
@@ -143,7 +145,7 @@ func get_next_unit_in_faction() -> Unit:
 		if u == current_unit:
 			passed_current = true
 			continue
-		if passed_current and u.team == current_unit.team and u.is_alive() and not _deferred_units.has(u):
+		if passed_current and u.team == current_unit.team and u.is_alive() and not _deferred_units.has(u) and not _completed_units.has(u):
 			return u
 	return null
 
@@ -164,6 +166,7 @@ func go_to_turn_start() -> void:
 func go_to_faction_turn(faction_id: int) -> void:
 	current_faction = faction_id
 	_clear_deferred_for_faction(faction_id)
+	_completed_units.clear()
 	_set_state(BattleState.FACTION_TURN_START)
 	faction_turn_started.emit(faction_id)
 	await transition_to(_faction_turn_start_state, {"faction": faction_id})
@@ -193,6 +196,8 @@ func go_to_unit_turn_end(unit: Unit) -> void:
 		current_turn, unit.team, unit.unit_name,
 		unit.action_points, unit.has_moved, unit.has_acted
 	])
+	if not _deferred_units.has(unit) and not _completed_units.has(unit):
+		_completed_units.append(unit)
 	_set_state(BattleState.UNIT_TURN_END)
 	unit_turn_ended.emit(unit)
 	await transition_to(unit_turn_end_state, {"unit": unit})

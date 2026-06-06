@@ -7,3 +7,4 @@ var action: CombatAction
 var source_unit: Unit
 var reaction: BaseReaction
 var reactor_unit: Unit
+var condition_result: ConditionResult
