@@ -74,17 +74,8 @@ func _on_tile_clicked(grid_pos: Vector2i) -> void:
 			show_menu_requested.emit(_active_unit, screen_pos + Vector2(40, -20))
 		return
 
-	# Set typed fields on the action based on its type, then dispatch.
-	if _pending_action is MoveAction:
-		var move_action := _pending_action as MoveAction
-		var reachable: Array[Vector2i] = _grid_system.get_reachable_cells(_active_unit.grid_position, _active_unit.get_effective_move_points())
-		if grid_pos not in reachable:
-			return
-		move_action.path = _grid_system.find_path(_active_unit.grid_position, grid_pos, _active_unit)
-	elif _pending_action is CombatAction:
-		var combat_action := _pending_action as CombatAction
-		combat_action.target_cell = grid_pos
-		combat_action.target_unit = _grid_system.get_occupant(grid_pos)
+	if not _pending_action.resolve_target(grid_pos, _active_unit, _grid_system):
+		return
 
 	_pending_action.on_deselected(_active_unit, _grid_system)
 	_execute_pending(_pending_action)

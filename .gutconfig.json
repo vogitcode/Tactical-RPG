@@ -1,0 +1,8 @@
+{
+    "dirs": ["res://Tests/"],
+    "prefix": "test_",
+    "suffix": ".gd",
+    "log_level": 1,
+    "junit_xml_file": "res://Tests/results/results.xml",
+    "junit_xml_timestamp": false
+}

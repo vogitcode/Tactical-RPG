@@ -159,6 +159,10 @@ func _rebuild_hook_index() -> void:
 				_hook_index[hook_id] = []
 			_hook_index[hook_id].append(passive)
 
+func add_passive(passive: BasePassive) -> void:
+	_runtime_passives.append(passive)
+	_rebuild_hook_index()
+
 ## Removes a passive at runtime (e.g. after single-use passives consume themselves).
 ## Rebuilds the hook index automatically.
 func remove_passive(passive: BasePassive) -> void:

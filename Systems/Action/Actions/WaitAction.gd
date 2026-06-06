@@ -9,7 +9,7 @@ func _init() -> void:
 	action_name = "Wait"
 	action_description = "Move to end of turn order."
 	ap_cost = 0
-	needs_target = false
+	target_mode = TargetMode.SELF
 	turn_effect = TurnEffect.DEFER
 
 func can_execute(unit: Unit) -> bool:

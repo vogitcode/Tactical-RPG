@@ -8,7 +8,7 @@ func _init() -> void:
 	action_name = "End Turn"
 	action_description = "End your turn."
 	ap_cost = 0
-	needs_target = false
+	target_mode = TargetMode.SELF
 	turn_effect = TurnEffect.END_TURN
 
 func can_execute(unit: Unit) -> bool:

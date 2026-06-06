@@ -7,7 +7,7 @@ func _init() -> void:
 	action_name = "Guard"
 	action_description = "Brace for incoming attacks. Reduces damage until next turn."
 	ap_cost = 1
-	needs_target = false
+	target_mode = TargetMode.SELF
 	_sets_has_acted = true
 	turn_effect = TurnEffect.GUARD
 	status_to_apply = &"guarding"

@@ -10,7 +10,6 @@ func _init() -> void:
 	action_name = "Attack"
 	action_description = "Attack an enemy within range."
 	ap_cost = 1
-	needs_target = true
 	base_rp = 10
 	_sets_has_acted = true
 	on_hit_effects.assign([DelayEffect.new(0.2), DamageEffect.new()])

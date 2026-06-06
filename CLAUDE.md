@@ -58,6 +58,25 @@ OK tạo bằng code: `Button`/`Label` trong dynamic list · `Tween`/`Timer` · 
 
 ---
 
+## Post-Implementation Review (áp dụng mọi thay đổi)
+
+Sau mỗi lần implement xong, **trước khi báo cáo hoàn thành**, nêu 1–2 rủi ro khả thi nhất từ checklist dưới. Không cần báo cáo đầy đủ — chỉ cần đủ để nhận ra vấn đề trước khi nó trở thành bug trong production.
+
+**Checklist rủi ro:**
+
+| Category | Câu hỏi |
+|---|---|
+| **Frame-loop** | Có iteration/allocation trong `_process()` hoặc hot path không? N entities × M operations/frame = N×M calls? |
+| **Memory / Lifecycle** | Signal connect mà không disconnect? Node giữ ref đến node đã `queue_free()`? Array tích lũy mà không clear? |
+| **Coupling** | Type switch (`is MoveAction`, `is CombatAction`)? System gọi trực tiếp method của system khác thay vì signal? |
+| **Contract / Boundary** | Method nhận input từ ngoài — validate chưa? Silent fail hay crash rõ ràng? |
+| **Scale** | Còn đúng với 50 units? N² ẩn trong loop tưởng O(N)? Gọi `find_path()` bao nhiêu lần/frame? |
+| **OCP** | Thêm action type / unit type / passive mới có phải sửa file này không? |
+
+**Cách trình bày:** Một dòng per rủi ro, kèm lý do cụ thể tại sao có rủi ro đó trong lần implement này. Không liệt kê toàn bộ checklist — chỉ những điểm thực sự relevant.
+
+---
+
 ## Ghi chú kỹ thuật
 
 - Godot 4.6.2 stable · GL Compatibility + D3D12 · GDScript
