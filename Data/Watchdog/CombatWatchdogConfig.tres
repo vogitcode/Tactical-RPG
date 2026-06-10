@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WatchdogConfig" format=3 uid="uid://bv4bwm8g8qucd"]
+
+[ext_resource type="Script" uid="uid://ceq835iq00k4r" path="res://Systems/Action/Executor/WatchdogConfig.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+category = &"combat"
+timeout_sec = 15.0

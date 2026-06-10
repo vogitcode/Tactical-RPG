@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WatchdogConfig" format=3 uid="uid://cv4j5gsn4w7q0"]
+
+[ext_resource type="Script" uid="uid://ceq835iq00k4r" path="res://Systems/Action/Executor/WatchdogConfig.gd" id="1_3tpvj"]
+
+[resource]
+script = ExtResource("1_3tpvj")
+category = &"move"
+metadata/_custom_type_script = "uid://ceq835iq00k4r"

@@ -15,6 +15,7 @@ extends Node2D
 @onready var grid_system: GridSystem                   = $GridSystem
 @onready var turn_system: TurnSystem                   = $TurnSystem
 @onready var action_system: ActionSystem               = $ActionHolder/ActionSystem
+@onready var _interrupt_manager: InterruptManager      = $ActionHolder/InterruptManager
 @onready var _move_system: MoveSystem                  = $ActionHolder/MoveSystem
 @onready var reaction_system: ReactionSystem           = $ReactionSystem
 @onready var input_system: InputSystem                 = $InputSystem
@@ -81,13 +82,13 @@ func _spawn_units() -> void:
 
 func _wire_systems() -> void:
 	input_system.setup(grid_system)
-	_move_system.setup(grid_system, reaction_system, action_system.get_interrupt_manager())
-	_combat_system.setup(grid_system)
+	_move_system.setup(grid_system, reaction_system, _interrupt_manager)
+	_combat_system.setup(grid_system, _interrupt_manager)
 	action_system.setup(grid_system, turn_system)
 	action_system.register_handler(&"move", _move_system)
 	action_system.register_handler(&"combat", _combat_system)
 	action_system.register_handler(&"turn_control", turn_system)
-	reaction_system.setup(action_system.get_interrupt_manager(), grid_system, action_system)
+	reaction_system.setup(_interrupt_manager, grid_system, action_system)
 	ai_system.setup(grid_system, unit_manager, action_system)
 	action_system.ai_turn_requested.connect(ai_system.on_ai_turn_requested)
 

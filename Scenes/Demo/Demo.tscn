@@ -16,13 +16,9 @@
 [ext_resource type="Script" uid="uid://nbkddo17rjuc" path="res://Systems/Grid/Visual/GridVisualizer.gd" id="15"]
 [ext_resource type="Script" uid="uid://cik4owlj6iepl" path="res://Systems/Turn/States/BattleStartState.gd" id="16"]
 [ext_resource type="Script" uid="uid://c11nauitphmob" path="res://Systems/Turn/States/TurnStartState.gd" id="17"]
+[ext_resource type="Script" uid="uid://ceq835iq00k4r" path="res://Systems/Action/Executor/WatchdogConfig.gd" id="17_1fkkg"]
 [ext_resource type="Script" uid="uid://dqsse2va2iidc" path="res://Systems/Turn/States/FactionTurnStartState.gd" id="18"]
 [ext_resource type="Script" uid="uid://pptfpev8u7u3" path="res://Systems/Turn/States/UnitTurnStartState.gd" id="19"]
-[ext_resource type="Script" path="res://Systems/Battle/CombatSystem.gd" id="28_cs"]
-[ext_resource type="Script" path="res://Systems/Battle/ReactionCollector.gd" id="29_rc"]
-[ext_resource type="Script" path="res://Systems/Battle/Arbitrator.gd" id="30_arb"]
-[ext_resource type="Script" path="res://Systems/Battle/EffectExecutor.gd" id="31_ee"]
-[ext_resource type="Script" path="res://Systems/Battle/PassiveScanner.gd" id="32_ps"]
 [ext_resource type="Script" uid="uid://bwbwbwq8aafjx" path="res://Systems/Turn/States/UnitActingState.gd" id="20"]
 [ext_resource type="Script" uid="uid://c75uafi2jnasu" path="res://Systems/Turn/States/UnitTurnEndState.gd" id="21"]
 [ext_resource type="Script" uid="uid://dgjoudlreuos" path="res://Systems/Turn/States/FactionTurnEndState.gd" id="22"]
@@ -31,8 +27,26 @@
 [ext_resource type="Script" uid="uid://bwn7501jhsbm0" path="res://Systems/GameState/GoalSystem.gd" id="25"]
 [ext_resource type="Script" uid="uid://6vdx2jmrudv" path="res://Systems/TurnEffect/TurnEffectProcessor.gd" id="26"]
 [ext_resource type="Script" uid="uid://c3n0ltwuuycv0" path="res://Systems/ProcessControl/ProcessMonitor.gd" id="27"]
-[ext_resource type="Script" path="res://Systems/AI/AISystem.gd" id="32_ai"]
-[ext_resource type="Script" path="res://Systems/AI/Brains/BanditBrain.gd" id="33_bb"]
+[ext_resource type="Script" uid="uid://bufaoc4nruvrh" path="res://Systems/Battle/CombatSystem.gd" id="28_cs"]
+[ext_resource type="Script" uid="uid://5aalrl72tbgi" path="res://Systems/Battle/ReactionCollector.gd" id="29_rc"]
+[ext_resource type="Script" uid="uid://chnj33g0xgk77" path="res://Systems/Battle/Arbitrator.gd" id="30_arb"]
+[ext_resource type="Script" uid="uid://d2j58n6je2ekq" path="res://Systems/Battle/EffectExecutor.gd" id="31_ee"]
+[ext_resource type="Script" uid="uid://docai4f7wgj3x" path="res://Systems/AI/AISystem.gd" id="32_ai"]
+[ext_resource type="Script" uid="uid://b67muamogbexq" path="res://Systems/Battle/PassiveScanner.gd" id="32_ps"]
+[ext_resource type="Script" uid="uid://cxxdwhq3ljyih" path="res://Systems/AI/Brains/BanditBrain.gd" id="33_bb"]
+[ext_resource type="Script" uid="uid://c53h6q12kqfo6" path="res://Systems/Action/Interaction/PlayerInteractionStateMachine.gd" id="pism"]
+[ext_resource type="Script" uid="uid://bojsfptbo2003" path="res://Systems/Action/Interaction/States/IdleInteractionState.gd" id="idle_is"]
+[ext_resource type="Script" uid="uid://df5van5pqrj78" path="res://Systems/Action/Interaction/States/MenuOpenInteractionState.gd" id="menu_is"]
+[ext_resource type="Script" uid="uid://xquqkbbiexa5" path="res://Systems/Action/Interaction/States/TargetingInteractionState.gd" id="targ_is"]
+
+[sub_resource type="Resource" id="Resource_1fkkg"]
+script = ExtResource("17_1fkkg")
+category = &"move"
+
+[sub_resource type="Resource" id="Resource_cf7pk"]
+script = ExtResource("17_1fkkg")
+category = &"combat"
+timeout_sec = 15.0
 
 [node name="GameLoop" type="Node" unique_id=300000001]
 script = ExtResource("1")
@@ -79,11 +93,27 @@ script = ExtResource("24")
 
 [node name="ActionHolder" type="Node" parent="SystemManager" unique_id=200000001]
 
+[node name="InterruptManager" type="Node" parent="SystemManager/ActionHolder" unique_id=200000005]
+script = ExtResource("11")
+watchdog_configs = Array[ExtResource("17_1fkkg")]([SubResource("Resource_1fkkg"), SubResource("Resource_cf7pk")])
+
 [node name="ActionSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=680845633]
 script = ExtResource("5")
 
-[node name="InterruptManager" type="Node" parent="SystemManager/ActionHolder/ActionSystem" unique_id=200000005]
-script = ExtResource("11")
+[node name="PlayerInteractionStateMachine" type="Node" parent="SystemManager/ActionHolder/ActionSystem" unique_id=500000001]
+script = ExtResource("pism")
+
+[node name="IdleInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine" unique_id=500000002]
+script = ExtResource("idle_is")
+phase = 0
+
+[node name="MenuOpenInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine" unique_id=500000003]
+script = ExtResource("menu_is")
+phase = 1
+
+[node name="TargetingInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine" unique_id=500000004]
+script = ExtResource("targ_is")
+phase = 2
 
 [node name="MoveSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=200000002]
 script = ExtResource("8")

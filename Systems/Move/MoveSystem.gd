@@ -18,10 +18,16 @@ func setup(grid: GridSystem, reaction_system: ReactionSystem = null, interrupt_m
 ## Handler interface — called by ActionSystem dispatch for category &"move".
 func handle_action(action: BaseAction, source_unit: Unit) -> ActionResult:
 	var move_action := action as MoveAction
+	var handle := _interrupt_manager.start_watch(&"move", source_unit)
+	handle.timed_out.connect(func(unit: Unit, _reason: String) -> void:
+		if is_instance_valid(_interrupt_manager):
+			_interrupt_manager.flag_interrupt(unit, "watchdog_timeout")
+	)
 	source_unit.show_active_hook_icons(&"get_move_points")
 	var result: ActionResult = await execute_move_async(
 		source_unit, move_action.path, Vector2i(-1, -1), _interrupt_manager
 	)
+	handle.complete()
 	if result.is_completed():
 		source_unit.has_moved = true
 		source_unit.action_points -= move_action.ap_cost

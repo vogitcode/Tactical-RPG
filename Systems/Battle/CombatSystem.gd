@@ -16,21 +16,31 @@ signal sequence_done
 @onready var _passive_scanner: PassiveScanner        = $PassiveScanner
 
 var _grid_system: GridSystem = null
+var _interrupt_manager: InterruptManager = null
 var _queue: Array[BattleProcess] = []
 var _is_running: bool = false
 var _last_result: ActionResult = null
 
-func setup(grid: GridSystem) -> void:
+func setup(grid: GridSystem, interrupt_manager: InterruptManager = null) -> void:
 	_grid_system = grid
+	_interrupt_manager = interrupt_manager
 
 ## Handler interface — called by ActionSystem dispatch for category &"combat".
 func handle_action(action: BaseAction, source_unit: Unit) -> ActionResult:
 	var combat_action := action as CombatAction
+	var handle: WatchdogHandle = null
+	if _interrupt_manager != null:
+		handle = _interrupt_manager.start_watch(&"combat", source_unit)
+		handle.timed_out.connect(func(_unit: Unit, reason: String) -> void:
+			push_warning("[CombatSystem] watchdog: %s" % reason)
+		)
 	_queue.append(_make_process(combat_action, source_unit))
 	if not _is_running:
 		await _drain()
 	else:
 		await sequence_done
+	if handle != null:
+		handle.complete()
 	return _last_result
 
 func _make_process(action: CombatAction, source_unit: Unit) -> BattleProcess:
