@@ -82,13 +82,14 @@ func _spawn_units() -> void:
 
 func _wire_systems() -> void:
 	input_system.setup(grid_system)
-	_move_system.setup(grid_system, reaction_system, _interrupt_manager)
+	_move_system.setup(grid_system, _interrupt_manager)
 	_combat_system.setup(grid_system, _interrupt_manager)
 	action_system.setup(grid_system, turn_system)
 	action_system.register_handler(&"move", _move_system)
 	action_system.register_handler(&"combat", _combat_system)
 	action_system.register_handler(&"turn_control", turn_system)
 	reaction_system.setup(_interrupt_manager, grid_system, action_system)
+	_move_system.unit_stepped.connect(reaction_system.evaluate_step)
 	ai_system.setup(grid_system, unit_manager, action_system)
 	action_system.ai_turn_requested.connect(ai_system.on_ai_turn_requested)
 

@@ -4,15 +4,17 @@
 class_name MoveSystem
 extends Node
 
+## Emitted after each step tween completes. Subscribers (PropSystem, ReactionSystem, tile hooks)
+## can flag interrupts via InterruptManager in response.
+signal unit_stepped(unit: Unit, cell: Vector2i)
+
 const MOVE_DURATION: float = 0.15
 
 var _grid_system: GridSystem = null
-var _reaction_system: ReactionSystem = null
 var _interrupt_manager: InterruptManager = null
 
-func setup(grid: GridSystem, reaction_system: ReactionSystem = null, interrupt_manager: InterruptManager = null) -> void:
+func setup(grid: GridSystem, interrupt_manager: InterruptManager = null) -> void:
 	_grid_system = grid
-	_reaction_system = reaction_system
 	_interrupt_manager = interrupt_manager
 
 ## Handler interface — called by ActionSystem dispatch for category &"move".
@@ -72,9 +74,7 @@ func execute_move_async(
 		tween.tween_property(unit, "position", end_pos, MOVE_DURATION)
 		await tween.finished
 
-		# TODO: TEMPORARY — will be replaced by BattleProcessor reaction collection
-		if _reaction_system != null:
-			_reaction_system.evaluate_step(unit, next_cell)
+		unit_stepped.emit(unit, next_cell)
 
 		if interrupt_manager.has_interrupt(unit):
 			_grid_system.clear_highlights()

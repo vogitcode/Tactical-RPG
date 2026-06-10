@@ -32,7 +32,7 @@ func handle_action(action: BaseAction, source_unit: Unit) -> ActionResult:
 	if _interrupt_manager != null:
 		handle = _interrupt_manager.start_watch(&"combat", source_unit)
 		handle.timed_out.connect(func(_unit: Unit, reason: String) -> void:
-			push_warning("[CombatSystem] watchdog: %s" % reason)
+			_interrupt_manager.flag_interrupt(_unit, reason)
 		)
 	_queue.append(_make_process(combat_action, source_unit))
 	if not _is_running:
@@ -56,6 +56,9 @@ func _drain() -> void:
 	while not _queue.is_empty():
 		var process: BattleProcess = _queue.pop_front()
 		_last_result = await _run_process(process)
+		if _last_result.is_interrupted():
+			_queue.clear()
+			break
 		_passive_scanner.scan(process)
 	_is_running = false
 	sequence_done.emit()
@@ -63,6 +66,18 @@ func _drain() -> void:
 func _run_process(process: BattleProcess) -> ActionResult:
 	var condition := _arbitrator.resolve(process.action, process.source_unit, process.reaction, process.reactor_unit)
 	process.condition_result = condition
+	if _check_abort(process.source_unit):
+		return ActionResult.interrupted("combat_abort")
 	if not condition.initiator_hit():
 		await process.reaction.execute_async(process.reactor_unit)
+	if _check_abort(process.source_unit):
+		return ActionResult.interrupted("combat_abort")
 	return await _effect_executor.execute(process.action, process.source_unit, condition, _grid_system)
+
+func _check_abort(unit: Unit) -> bool:
+	if _interrupt_manager == null:
+		return false
+	if _interrupt_manager.has_interrupt(unit):
+		_interrupt_manager.consume_interrupt(unit)
+		return true
+	return false
