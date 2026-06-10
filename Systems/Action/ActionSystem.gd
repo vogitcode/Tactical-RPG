@@ -84,6 +84,9 @@ func _execute_pending(action: BaseAction) -> void:
 
 	if unit == null:
 		return
+	if not unit.is_alive():
+		_finish_unit_turn(unit)
+		return
 	if result.status == ActionResult.Status.DEFERRED:
 		_turn_system.defer_unit(unit)
 		_finish_unit_turn(unit)
@@ -123,3 +126,7 @@ func handle_hotkey(action_id: StringName) -> void:
 
 func cancel_pending() -> void:
 	_sm.on_cancel()
+
+func on_unit_died(unit: Unit) -> void:
+	if unit == _sm.ctx.active_unit and not _is_executing:
+		_finish_unit_turn(unit)

@@ -76,6 +76,10 @@ func execute_move_async(
 
 		unit_stepped.emit(unit, next_cell)
 
+		if not unit.is_alive():
+			_grid_system.clear_highlights()
+			return ActionResult.interrupted("unit_died")
+
 		if interrupt_manager.has_interrupt(unit):
 			_grid_system.clear_highlights()
 			return ActionResult.interrupted(interrupt_manager.consume_interrupt(unit))

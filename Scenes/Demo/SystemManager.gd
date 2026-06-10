@@ -58,6 +58,12 @@ func _build_map() -> void:
 	for pos in water:
 		grid_system.set_tile(pos, WaterTile.new())
 
+	var fire: Array[Vector2i] = [
+		Vector2i(4, 2), Vector2i(4, 3), Vector2i(4, 4),
+	]
+	for pos in fire:
+		grid_system.set_tile(pos, FireTile.new())
+
 # --- Unit spawning ---
 # UnitManager creates and owns the Unit nodes.
 # SystemManager coordinates the cross-system handshake: spawn → place on grid.
@@ -108,6 +114,7 @@ func _wire_systems() -> void:
 	turn_system.unit_turn_ended.connect(_on_unit_turn_ended)
 
 	unit_manager.unit_died.connect(_on_unit_died)
+	unit_manager.unit_died.connect(action_system.on_unit_died)
 
 	# GoalSystem: subscribe to unit death, notify TurnSystem via signal
 	goal_system.setup(unit_manager)
