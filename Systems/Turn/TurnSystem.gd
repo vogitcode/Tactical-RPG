@@ -188,8 +188,20 @@ func go_to_unit_turn(unit: Unit) -> void:
 	await transition_to(unit_turn_start_state, {"unit": unit})
 
 func go_to_unit_acting(unit: Unit) -> void:
+	if not unit.is_alive():
+		await go_to_unit_turn_end(unit)
+		return
 	_set_state(BattleState.UNIT_ACTING)
-	await transition_to(unit_acting_state, {"unit": unit})
+	transition_to(unit_acting_state, {"unit": unit})
+
+## Entry point of the next coroutine chain — called (deferred) by ActionSystem.unit_turn_finished.
+func on_unit_turn_finished(unit: Unit) -> void:
+	if current_state != BattleState.UNIT_ACTING:
+		return
+	if is_battle_ending():
+		await go_to_battle_end()
+		return
+	await go_to_unit_turn_end(unit)
 
 func go_to_unit_turn_end(unit: Unit) -> void:
 	print("[Turn %d][Faction %d] << %s ends turn (AP:%d moved:%s acted:%s)" % [

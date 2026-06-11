@@ -8,7 +8,7 @@ signal action_execution_started(action: BaseAction, unit: Unit)
 signal action_execution_finished(action: BaseAction, unit: Unit, result: ActionResult)
 signal show_menu_requested(unit: Unit, position: Vector2)
 signal ai_turn_requested(unit: Unit)
-signal unit_turn_finished
+signal unit_turn_finished(unit: Unit)
 
 @onready var _sm: PlayerInteractionStateMachine = $PlayerInteractionStateMachine
 
@@ -31,7 +31,7 @@ func register_handler(category: StringName, handler: Node) -> void:
 
 # --- TurnSystem callback ---
 
-func on_unit_acting(unit: Unit, _token: StateCompletionToken) -> void:
+func on_unit_acting(unit: Unit) -> void:
 	_sm.ctx.pending_action = null
 	if unit.team == 0:
 		_sm.on_unit_acting(unit)
@@ -108,7 +108,7 @@ func _finish_unit_turn(unit: Unit) -> void:
 	var unit_name := unit.unit_name if unit != null else "???"
 	print("  [Finish] %s releases turn" % unit_name)
 	_sm.ctx.active_unit = null
-	unit_turn_finished.emit()
+	unit_turn_finished.emit(unit)
 
 # --- InputSystem callbacks ---
 

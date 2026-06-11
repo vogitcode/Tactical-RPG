@@ -25,6 +25,7 @@ extends Node2D
 @onready var process_monitor: ProcessMonitor           = $ProcessMonitor
 @onready var _combat_system: CombatSystem               = $ActionHolder/CombatSystem
 @onready var ai_system: AISystem                       = $AISystem
+@onready var zone_processor: ZoneProcessor             = $ZoneProcessor
 
 # --- Public API (called by GameLoop) ---
 
@@ -34,6 +35,7 @@ func initialize() -> void:
 	_spawn_units()
 	_wire_systems()
 	_setup_reactions()
+	_place_zones()
 	turn_system.register_units(unit_manager.get_all_units())
 
 ## Starts the battle. Called by GameLoop after cross-boundary wiring is done.
@@ -99,6 +101,13 @@ func _wire_systems() -> void:
 	ai_system.setup(grid_system, unit_manager, action_system)
 	action_system.ai_turn_requested.connect(ai_system.on_ai_turn_requested)
 
+	zone_processor.setup(grid_system)
+	_move_system.unit_stepped.connect(zone_processor._on_unit_stepped)
+	# Zone fires before tile on turn_start — connection order determines call order.
+	turn_system.unit_turn_started.connect(zone_processor._on_unit_turn_started)
+	turn_system.turn_started.connect(zone_processor._on_turn_cycle_started)
+	unit_manager.unit_died.connect(zone_processor._on_unit_died)
+
 	input_system.tile_clicked.connect(grid_system.on_tile_clicked)
 	input_system.tile_hovered.connect(grid_system.on_tile_hovered)
 	input_system.action_hotkey_pressed.connect(action_system.handle_hotkey)
@@ -107,7 +116,7 @@ func _wire_systems() -> void:
 	turn_system.unit_turn_start_state.activated.connect(turn_effect_processor.on_unit_turn_start)
 	turn_system.unit_turn_end_state.activated.connect(turn_effect_processor.on_unit_turn_end)
 	turn_system.unit_acting_state.activated.connect(action_system.on_unit_acting)
-	action_system.unit_turn_finished.connect(turn_system.unit_acting_state.release_unit_turn, CONNECT_DEFERRED)
+	action_system.unit_turn_finished.connect(turn_system.on_unit_turn_finished, CONNECT_DEFERRED)
 
 	turn_system.unit_turn_started.connect(grid_system.fire_unit_turn_start)
 	turn_system.unit_turn_started.connect(_on_unit_turn_started)
@@ -119,6 +128,25 @@ func _wire_systems() -> void:
 	# GoalSystem: subscribe to unit death, notify TurnSystem via signal
 	goal_system.setup(unit_manager)
 	goal_system.goal_achieved.connect(turn_system.trigger_battle_end)
+
+# --- Zones ---
+
+func _place_zones() -> void:
+	var fire_effect := FixedDamageEffect.new()
+	fire_effect.damage = 3
+
+	var fire_zone := ZoneData.new()
+	fire_zone.zone_id = &"demo_fire_zone"
+	fire_zone.element = &"fire"
+	fire_zone.priority = 5
+	fire_zone.triggers.assign([&"unit_entered", &"on_turn_start"])
+	fire_zone.duration_turns = -1
+	fire_zone.default_effect = fire_effect
+
+	var zone_cells: Array[Vector2i] = [Vector2i(6, 5), Vector2i(8, 2)]
+	for cell in zone_cells:
+		zone_processor.place_zone(fire_zone, cell)
+	grid_system.visualizer.highlight_cells(zone_cells, GridVisualizer.HighlightType.DANGER)
 
 # --- Reactions ---
 
