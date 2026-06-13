@@ -35,6 +35,7 @@
 [ext_resource type="Script" uid="uid://b67muamogbexq" path="res://Systems/Battle/PassiveScanner.gd" id="32_ps"]
 [ext_resource type="Script" uid="uid://cxxdwhq3ljyih" path="res://Systems/AI/Brains/BanditBrain.gd" id="33_bb"]
 [ext_resource type="Script" path="res://Systems/Zone/ZoneProcessor.gd" id="zp"]
+[ext_resource type="Script" path="res://Systems/Prop/PropSystem.gd" id="ps"]
 [ext_resource type="Script" uid="uid://c53h6q12kqfo6" path="res://Systems/Action/Interaction/PlayerInteractionStateMachine.gd" id="pism"]
 [ext_resource type="Script" uid="uid://bojsfptbo2003" path="res://Systems/Action/Interaction/States/IdleInteractionState.gd" id="idle_is"]
 [ext_resource type="Script" uid="uid://df5van5pqrj78" path="res://Systems/Action/Interaction/States/MenuOpenInteractionState.gd" id="menu_is"]
@@ -161,6 +162,9 @@ faction_id = 1
 
 [node name="ZoneProcessor" type="Node" parent="SystemManager" unique_id=600000001]
 script = ExtResource("zp")
+
+[node name="PropSystem" type="Node" parent="SystemManager" unique_id=700000001]
+script = ExtResource("ps")
 
 [node name="WorldUIManager" type="Node2D" parent="." unique_id=200000009]
 

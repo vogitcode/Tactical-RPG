@@ -26,6 +26,7 @@ extends Node2D
 @onready var _combat_system: CombatSystem               = $ActionHolder/CombatSystem
 @onready var ai_system: AISystem                       = $AISystem
 @onready var zone_processor: ZoneProcessor             = $ZoneProcessor
+@onready var prop_system: PropSystem                   = $PropSystem
 
 # --- Public API (called by GameLoop) ---
 
@@ -34,8 +35,8 @@ func initialize() -> void:
 	_build_map()
 	_spawn_units()
 	_wire_systems()
-	_setup_reactions()
 	_place_zones()
+	_place_props()
 	turn_system.register_units(unit_manager.get_all_units())
 
 ## Starts the battle. Called by GameLoop after cross-boundary wiring is done.
@@ -108,6 +109,11 @@ func _wire_systems() -> void:
 	turn_system.turn_started.connect(zone_processor._on_turn_cycle_started)
 	unit_manager.unit_died.connect(zone_processor._on_unit_died)
 
+	prop_system.setup(grid_system)
+	_move_system.unit_stepped.connect(prop_system._on_unit_stepped)
+	turn_system.unit_turn_started.connect(prop_system._on_unit_turn_started)
+	unit_manager.unit_died.connect(prop_system._on_unit_died)
+
 	input_system.tile_clicked.connect(grid_system.on_tile_clicked)
 	input_system.tile_hovered.connect(grid_system.on_tile_hovered)
 	input_system.action_hotkey_pressed.connect(action_system.handle_hotkey)
@@ -148,14 +154,11 @@ func _place_zones() -> void:
 		zone_processor.place_zone(fire_zone, cell)
 	grid_system.visualizer.highlight_cells(zone_cells, GridVisualizer.HighlightType.DANGER)
 
-# --- Reactions ---
+# --- Props ---
 
-func _setup_reactions() -> void:
-	reaction_system.register_interrupt_rule(
-		func(unit: Unit, cell: Vector2i) -> bool:
-			return cell == Vector2i(6, 3) and unit.team == 0,
-		"trap"
-	)
+func _place_props() -> void:
+	var trap := TrapProp.new()
+	prop_system.place_prop(trap, Vector2i(6, 3))
 	grid_system.visualizer.highlight_cells([Vector2i(6, 3)], GridVisualizer.HighlightType.DANGER)
 
 # --- Display callbacks ---

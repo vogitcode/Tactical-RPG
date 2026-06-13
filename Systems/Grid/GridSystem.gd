@@ -11,6 +11,7 @@ signal unit_moved(unit: Unit, from: Vector2i, to: Vector2i)
 
 var data: GridData
 var _adapter: TopDownGridAdapter
+var _extra_passable_checks: Array[Callable] = []
 
 @onready var visualizer: GridVisualizer = $GridVisualizer
 
@@ -54,16 +55,35 @@ func move_unit(unit: Unit, to: Vector2i) -> void:
 
 	unit_moved.emit(unit, from, to)
 
+# --- Passable check registry (Option B — no GridData changes) ---
+
+## Register an extra passability condition: func(pos: Vector2i) -> bool
+## Returns true if pos is BLOCKED by that condition.
+func register_passable_check(check: Callable) -> void:
+	_extra_passable_checks.append(check)
+
+func _build_passable_override(unit: Unit = null) -> Callable:
+	if _extra_passable_checks.is_empty():
+		return Callable()
+	var checks := _extra_passable_checks.duplicate()
+	return func(pos: Vector2i) -> bool:
+		for c in checks:
+			if c.call(pos):
+				return false
+		if unit != null:
+			return data.is_passable_for(pos, unit)
+		return data.is_passable(pos)
+
 # --- Queries exposed to other systems ---
 
-func get_reachable_cells(from: Vector2i, move_points: int) -> Array[Vector2i]:
-	return GridLogic.get_reachable_cells(data, from, move_points)
+func get_reachable_cells(from: Vector2i, move_points: int, unit: Unit = null) -> Array[Vector2i]:
+	return GridLogic.get_reachable_cells(data, from, move_points, _build_passable_override(unit))
 
 func get_attack_range_cells(from: Vector2i, min_r: int, max_r: int) -> Array[Vector2i]:
 	return GridLogic.get_range_cells(data, from, min_r, max_r)
 
 func find_path(from: Vector2i, to: Vector2i, unit: Unit = null) -> Array[Vector2i]:
-	return GridLogic.find_path(data, from, to, unit)
+	return GridLogic.find_path(data, from, to, unit, _build_passable_override(unit))
 
 func get_occupant(pos: Vector2i) -> Unit:
 	return data.get_occupant(pos) as Unit

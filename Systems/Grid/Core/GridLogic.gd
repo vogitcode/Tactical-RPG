@@ -44,7 +44,13 @@ static func get_reachable_cells(
 
 # --- A* pathfinding ---
 
-static func find_path(grid: GridData, from: Vector2i, to: Vector2i, unit: Node = null) -> Array[Vector2i]:
+static func find_path(
+	grid: GridData,
+	from: Vector2i,
+	to: Vector2i,
+	unit: Node = null,
+	passable_override: Callable = Callable()  # optional: func(pos) -> bool
+) -> Array[Vector2i]:
 	if not grid.is_valid(to):
 		return []
 
@@ -72,7 +78,11 @@ static func find_path(grid: GridData, from: Vector2i, to: Vector2i, unit: Node =
 				continue
 			if not grid.is_valid(neighbor):
 				continue
-			var passable: bool = grid.is_passable_for(neighbor, unit) if unit != null else grid.is_passable(neighbor)
+			var passable: bool
+			if passable_override.is_valid():
+				passable = passable_override.call(neighbor)
+			else:
+				passable = grid.is_passable_for(neighbor, unit) if unit != null else grid.is_passable(neighbor)
 			if not passable and neighbor != to:
 				continue
 			var tile_cost := 1
