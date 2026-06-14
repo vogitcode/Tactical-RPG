@@ -4,4 +4,5 @@
 class_name MoveQueryContext
 extends PassiveContext
 
+var unit: Unit = null
 var bonus_move_points: int = 0

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scenes/TraitDemo/TraitDemoScene.gd" id="1"]
+
+[node name="TraitDemo" type="Node"]
+script = ExtResource("1")

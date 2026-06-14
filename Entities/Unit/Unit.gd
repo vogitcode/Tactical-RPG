@@ -29,6 +29,7 @@ var _sprite: Sprite2D
 var _status_receiver: StatusEffectReceiver
 var _hook_index: Dictionary = {}
 var _runtime_passives: Array[BasePassive] = []
+var _capabilities: Dictionary = {}  # Blackboard: StringName → Variant
 
 func _ready() -> void:
 	current_hp = max_hp
@@ -41,6 +42,10 @@ func _ready() -> void:
 	if unit_data != null:
 		_runtime_passives.assign(unit_data.passives)
 	_rebuild_hook_index()
+	for passive in _runtime_passives:
+		var ctx := AttachContext.new()
+		ctx.unit = self
+		passive.handle_hook(&"on_passive_attached", ctx)
 
 func get_status_receiver() -> StatusEffectReceiver:
 	return _status_receiver
@@ -77,6 +82,10 @@ func get_available_actions() -> Array[BaseAction]:
 	for action in all:
 		if action.can_execute(self):
 			available.append(action)
+	var extra_ctx := AvailableActionsContext.new()
+	extra_ctx.unit = self
+	fire_hook(&"get_available_actions", extra_ctx)
+	available.append_array(extra_ctx.extra_actions)
 	return available
 
 func _build_action_list() -> Array[BaseAction]:
@@ -159,15 +168,36 @@ func _rebuild_hook_index() -> void:
 				_hook_index[hook_id] = []
 			_hook_index[hook_id].append(passive)
 
+func get_runtime_passives() -> Array[BasePassive]:
+	return _runtime_passives
+
 func add_passive(passive: BasePassive) -> void:
 	_runtime_passives.append(passive)
 	_rebuild_hook_index()
+	var ctx := AttachContext.new()
+	ctx.unit = self
+	passive.handle_hook(&"on_passive_attached", ctx)
 
-## Removes a passive at runtime (e.g. after single-use passives consume themselves).
-## Rebuilds the hook index automatically.
 func remove_passive(passive: BasePassive) -> void:
+	var ctx := DetachContext.new()
+	ctx.unit = self
+	passive.handle_hook(&"on_passive_detached", ctx)
 	_runtime_passives.erase(passive)
 	_rebuild_hook_index()
+
+# --- Blackboard (dynamic capability bag) ---
+
+func set_capability(key: StringName, value: Variant) -> void:
+	_capabilities[key] = value
+
+func has_capability(key: StringName) -> bool:
+	return _capabilities.has(key)
+
+func get_capability(key: StringName, default: Variant = null) -> Variant:
+	return _capabilities.get(key, default)
+
+func remove_capability(key: StringName) -> void:
+	_capabilities.erase(key)
 
 func fire_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 	for passive in _hook_index.get(hook_id, []):
@@ -175,6 +205,7 @@ func fire_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 
 func get_effective_move_points() -> int:
 	var ctx := MoveQueryContext.new()
+	ctx.unit = self
 	fire_hook(&"get_move_points", ctx)
 	return move_points + ctx.bonus_move_points
 
