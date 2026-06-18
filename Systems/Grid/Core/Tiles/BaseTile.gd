@@ -13,6 +13,7 @@ extends Resource
 
 ## Gameplay defaults — override in subclasses via _init or @export in Inspector.
 @export var movement_cost: int = 1
+@export var hazard_cost: int = 0   # A* routing penalty — does not affect actual MP deduction
 @export var blocks_movement: bool = false
 @export var blocks_los: bool = false
 
@@ -26,6 +27,11 @@ func can_enter(_unit: Node) -> bool:
 
 func get_movement_cost(_unit: Node) -> int:
 	return movement_cost
+
+## A* pathfinding weight. Inflated for hazard tiles so pathfinder prefers safe routes.
+## Does NOT affect actual MP cost — only routing preference.
+func get_pathfinding_cost(_unit: Node) -> int:
+	return movement_cost + hazard_cost
 
 func on_unit_enter(_unit: Node, _grid_pos: Vector2i) -> void:
 	pass

@@ -30,10 +30,21 @@ func handle_action(action: BaseAction, source_unit: Unit) -> ActionResult:
 		source_unit, move_action.path, Vector2i(-1, -1), _interrupt_manager
 	)
 	handle.complete()
-	if result.is_completed():
-		source_unit.has_moved = true
-		source_unit.action_points -= move_action.ap_cost
+	if result.is_completed() or result.is_interrupted():
+		var cost := _compute_path_cost(move_action.path, source_unit.grid_position)
+		source_unit.remaining_mp = maxi(0, source_unit.remaining_mp - cost)
 	return result
+
+func _compute_path_cost(path: Array[Vector2i], final_pos: Vector2i) -> int:
+	var cost := 0
+	for i in range(1, path.size()):
+		var cell := path[i]
+		var tile := _grid_system.data.get_tile(cell)
+		if tile:
+			cost += tile.movement_cost
+		if cell == final_pos:
+			break
+	return cost
 
 # --- Queries (callable by any mechanic) ---
 
@@ -47,6 +58,8 @@ func find_path(from: Vector2i, to: Vector2i, unit: Unit = null) -> Array[Vector2
 
 ## Moves unit along path one cell at a time, checking for interrupts at each step.
 ## If path is empty, attempts to find one from unit.grid_position to target_cell.
+## Phase 1 (traversal): read-only — GridData is not touched. unit.grid_position unchanged.
+## Phase 2 (commit): atomic — one move_occupant call at origin → final_cell.
 func execute_move_async(
 	unit: Unit,
 	path: Array[Vector2i],
@@ -61,28 +74,31 @@ func execute_move_async(
 
 	_grid_system.clear_highlights()
 
+	var origin := unit.grid_position
+	var current_cell := origin
+
 	for i in range(1, actual_path.size()):
-		var next_cell: Vector2i = actual_path[i]
+		var stepped_cell: Vector2i = actual_path[i]
 		_grid_system.show_path(actual_path.slice(i))
 
-		var start_pos := unit.position
-		_grid_system.move_unit(unit, next_cell)
-		var end_pos := unit.position
-		unit.position = start_pos
-
+		var end_pos := _grid_system.get_cell_position(stepped_cell)
 		var tween := unit.create_tween()
 		tween.tween_property(unit, "position", end_pos, MOVE_DURATION)
 		await tween.finished
 
-		unit_stepped.emit(unit, next_cell)
+		current_cell = stepped_cell
+		unit_stepped.emit(unit, stepped_cell)
 
 		if not unit.is_alive():
+			_grid_system.commit_unit_move(unit, origin, current_cell)
 			_grid_system.clear_highlights()
 			return ActionResult.interrupted("unit_died")
 
 		if interrupt_manager.has_interrupt(unit):
+			_grid_system.commit_unit_move(unit, origin, current_cell)
 			_grid_system.clear_highlights()
 			return ActionResult.interrupted(interrupt_manager.consume_interrupt(unit))
 
+	_grid_system.commit_unit_move(unit, origin, current_cell)
 	_grid_system.clear_highlights()
 	return ActionResult.completed()

@@ -204,9 +204,9 @@ func on_unit_turn_finished(unit: Unit) -> void:
 	await go_to_unit_turn_end(unit)
 
 func go_to_unit_turn_end(unit: Unit) -> void:
-	print("[Turn %d][Faction %d] << %s ends turn (AP:%d moved:%s acted:%s)" % [
+	print("[Turn %d][Faction %d] << %s ends turn (AP:%d mp:%d acted:%s)" % [
 		current_turn, unit.team, unit.unit_name,
-		unit.action_points, unit.has_moved, unit.has_acted
+		unit.action_points, unit.remaining_mp, unit.has_acted
 	])
 	if not _deferred_units.has(unit) and not _completed_units.has(unit):
 		_completed_units.append(unit)

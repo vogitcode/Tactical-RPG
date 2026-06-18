@@ -88,7 +88,7 @@ static func find_path(
 			var tile_cost := 1
 			var neighbor_cell := grid.get_cell(neighbor)
 			if neighbor_cell and neighbor_cell.tile:
-				tile_cost = neighbor_cell.tile.get_movement_cost(unit) if unit != null else neighbor_cell.tile.movement_cost
+				tile_cost = neighbor_cell.tile.get_pathfinding_cost(unit) if unit != null else neighbor_cell.tile.movement_cost
 			var new_g: int = g + tile_cost
 			var new_f: int = new_g + _heuristic(neighbor, to)
 			open_set.append([new_f, new_g, neighbor, path + [pos]])
@@ -136,6 +136,10 @@ static func get_4_neighbors(pos: Vector2i) -> Array[Vector2i]:
 
 static func get_manhattan_distance(a: Vector2i, b: Vector2i) -> int:
 	return abs(a.x - b.x) + abs(a.y - b.y)
+
+static func is_in_range(from: Vector2i, to: Vector2i, min_r: int, max_r: int) -> bool:
+	var dist := get_manhattan_distance(from, to)
+	return dist >= min_r and dist <= max_r
 
 # --- Private ---
 

@@ -87,6 +87,10 @@ func _spawn_units() -> void:
 	var e2 := unit_manager.spawn_unit(bandit, 1)
 	grid_system.place_unit(e2, Vector2i(10, 6))
 
+	var archer: UnitData = load("res://Data/Units/ArcherData.tres")
+	var e3 := unit_manager.spawn_unit(archer, 1)
+	grid_system.place_unit(e3, Vector2i(8, 8))
+
 # --- Internal system wiring ---
 
 func _wire_systems() -> void:

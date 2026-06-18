@@ -30,10 +30,14 @@ const GRID_LINE_WIDTH := 0.8
 const TILES_SOURCE_ID := 0   # tiles.png
 const ANIM_SOURCE_ID   := 1  # animated-tiles.png
 
+const PATH_LINE_COLOR := Color(1.0, 1.0, 1.0, 0.90)
+const PATH_LINE_WIDTH := 3.0
+
 var _grid_data: GridData = null
 var _adapter: GridCoordinateAdapter = null
 var _highlights: Dictionary = {}   # Vector2i -> HighlightType
 var _hovered_cell: Vector2i = Vector2i(-1, -1)
+var _path_points: PackedVector2Array = []
 
 var _tile_map: TileMapLayer = null
 var _tile_set: TileSet = null
@@ -58,10 +62,22 @@ func highlight_cells(cells: Array[Vector2i], type: HighlightType) -> void:
 func clear_highlights(type: HighlightType = -1) -> void:
 	if type == -1:
 		_highlights.clear()
+		_path_points.clear()
 	else:
 		for key in _highlights.keys():
 			if _highlights[key] == type:
 				_highlights.erase(key)
+	queue_redraw()
+
+func show_path_line(cells: Array[Vector2i]) -> void:
+	_path_points.clear()
+	var half := Vector2(_adapter.get_cell_size()) * 0.5
+	for cell in cells:
+		_path_points.append(_adapter.grid_to_world(cell) + half)
+	queue_redraw()
+
+func clear_path_line() -> void:
+	_path_points.clear()
 	queue_redraw()
 
 func set_selected_cell(pos: Vector2i) -> void:
@@ -96,6 +112,7 @@ func _draw() -> void:
 	_draw_highlights()
 	_draw_grid_lines()
 	_draw_hover()
+	_draw_path_line()
 
 func _draw_highlights() -> void:
 	var cell_size := Vector2(_adapter.get_cell_size())
@@ -120,6 +137,11 @@ func _draw_grid_lines() -> void:
 		var left := _adapter.grid_to_world(Vector2i(0, y))
 		var right := _adapter.grid_to_world(Vector2i(_grid_data.width, y))
 		draw_line(left, right, GRID_LINE_COLOR, GRID_LINE_WIDTH)
+
+func _draw_path_line() -> void:
+	if _path_points.size() < 2:
+		return
+	draw_polyline(_path_points, PATH_LINE_COLOR, PATH_LINE_WIDTH, true)
 
 func _draw_hover() -> void:
 	if _hovered_cell == Vector2i(-1, -1):

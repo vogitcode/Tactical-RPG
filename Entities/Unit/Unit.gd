@@ -17,7 +17,7 @@ var unit_data: UnitData
 
 # Turn state — reset each turn
 var action_points: int = 0
-var has_moved: bool = false
+var remaining_mp: int = 0
 var has_acted: bool = false
 var has_waited: bool = false
 
@@ -34,6 +34,7 @@ var _capabilities: Dictionary = {}  # Blackboard: StringName → Variant
 func _ready() -> void:
 	current_hp = max_hp
 	action_points = max_action_points
+	remaining_mp = move_points
 	add_to_group("units")
 	_sprite = Sprite2D.new()
 	add_child(_sprite)
@@ -69,7 +70,7 @@ func set_grid_position(pos: Vector2i) -> void:
 
 func reset_turn() -> void:
 	action_points = max_action_points
-	has_moved = false
+	remaining_mp = get_effective_move_points()
 	has_acted = false
 	has_waited = false
 	_status_receiver.tick_and_expire(self)

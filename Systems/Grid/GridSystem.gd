@@ -62,7 +62,8 @@ func move_unit(unit: Unit, to: Vector2i) -> void:
 func register_passable_check(check: Callable) -> void:
 	_extra_passable_checks.append(check)
 
-func _build_passable_override(unit: Unit = null) -> Callable:
+## Generic passable override — no unit, uses tile.blocks_movement + occupant.
+func _build_passable_override() -> Callable:
 	if _extra_passable_checks.is_empty():
 		return Callable()
 	var checks := _extra_passable_checks.duplicate()
@@ -70,20 +71,59 @@ func _build_passable_override(unit: Unit = null) -> Callable:
 		for c in checks:
 			if c.call(pos):
 				return false
-		if unit != null:
-			return data.is_passable_for(pos, unit)
 		return data.is_passable(pos)
+
+## Traversal override for BFS mid-expansion — unit-aware tile check + friendly occupant allowed.
+## Enemy-occupied cells block expansion by default.
+func _build_traversal_override(unit: Unit) -> Callable:
+	var checks := _extra_passable_checks.duplicate()
+	return func(pos: Vector2i) -> bool:
+		for c in checks:
+			if c.call(pos):
+				return false
+		if not data.is_passable_ignore_occupant_for(pos, unit):
+			return false
+		var occ := data.get_occupant(pos) as Unit
+		if occ == null:
+			return true
+		return occ.team == unit.team  # friendly = traversable, enemy = blocked
 
 # --- Queries exposed to other systems ---
 
 func get_reachable_cells(from: Vector2i, move_points: int, unit: Unit = null) -> Array[Vector2i]:
-	return GridLogic.get_reachable_cells(data, from, move_points, _build_passable_override(unit))
+	if unit != null:
+		var all_cells := GridLogic.get_reachable_cells(data, from, move_points, _build_traversal_override(unit))
+		# Post-filter: unit cannot end turn on an occupied cell
+		var destinations: Array[Vector2i] = []
+		for pos in all_cells:
+			if data.get_occupant(pos) == null:
+				destinations.append(pos)
+		return destinations
+	return GridLogic.get_reachable_cells(data, from, move_points, _build_passable_override())
 
 func get_attack_range_cells(from: Vector2i, min_r: int, max_r: int) -> Array[Vector2i]:
 	return GridLogic.get_range_cells(data, from, min_r, max_r)
 
 func find_path(from: Vector2i, to: Vector2i, unit: Unit = null) -> Array[Vector2i]:
-	return GridLogic.find_path(data, from, to, unit, _build_passable_override(unit))
+	if unit != null:
+		return GridLogic.find_path(data, from, to, unit, _build_traversal_override(unit))
+	return GridLogic.find_path(data, from, to, null, _build_passable_override())
+
+## Returns the cell in the [min_r, max_r] ring from `from` that is closest to `toward`.
+## Does not filter by occupancy — caller decides what to do with the result.
+## Returns Vector2i(-1, -1) if the ring is empty (e.g. out-of-bounds map).
+func get_nearest_in_range(from: Vector2i, toward: Vector2i, min_r: int, max_r: int) -> Vector2i:
+	var ring := GridLogic.get_range_cells(data, from, min_r, max_r)
+	if ring.is_empty():
+		return Vector2i(-1, -1)
+	var best := ring[0]
+	var best_dist := GridLogic.get_manhattan_distance(best, toward)
+	for cell in ring.slice(1):
+		var d := GridLogic.get_manhattan_distance(cell, toward)
+		if d < best_dist:
+			best_dist = d
+			best = cell
+	return best
 
 func get_occupant(pos: Vector2i) -> Unit:
 	return data.get_occupant(pos) as Unit
@@ -105,7 +145,7 @@ func show_attack_range(cells: Array[Vector2i]) -> void:
 	visualizer.highlight_cells(cells, GridVisualizer.HighlightType.ATTACK_RANGE)
 
 func show_path(cells: Array[Vector2i]) -> void:
-	visualizer.highlight_cells(cells, GridVisualizer.HighlightType.PATH)
+	visualizer.show_path_line(cells)
 
 func highlight_selected(pos: Vector2i) -> void:
 	visualizer.set_selected_cell(pos)
@@ -124,6 +164,25 @@ func world_to_grid(world_pos: Vector2) -> Vector2i:
 func get_cell_center(pos: Vector2i) -> Vector2:
 	var world := _adapter.grid_to_world(pos)
 	return visualizer.to_global(world + Vector2(config.cell_size) * 0.5)
+
+## Returns the local position for a cell — same coordinate space as unit.position.
+## Use this to compute tween targets without touching occupant data.
+func get_cell_position(pos: Vector2i) -> Vector2:
+	return visualizer.to_local(_adapter.grid_to_world(pos)) + Vector2(config.cell_size) * 0.5
+
+## Atomic commit after movement completes (or is interrupted).
+## Fires tile exit/enter hooks and updates occupant data in one operation.
+## Call once at the end of execute_move_async, never during traversal.
+func commit_unit_move(unit: Unit, origin: Vector2i, final_cell: Vector2i) -> void:
+	var from_tile := data.get_tile(origin)
+	var to_tile := data.get_tile(final_cell)
+	if from_tile:
+		from_tile.on_unit_exit(unit, origin)
+	data.move_occupant(origin, final_cell)
+	unit.set_grid_position(final_cell)
+	if to_tile:
+		to_tile.on_unit_enter(unit, final_cell)
+	unit_moved.emit(unit, origin, final_cell)
 
 # --- Turn hook callbacks (called by TurnSystem via SystemManager wiring) ---
 
