@@ -27,7 +27,7 @@ func resolve(action: CombatAction, source_unit: Unit, reaction: BaseReaction, re
 func _compute_rp(base_rp: int, unit: Unit, stat_name: StringName) -> int:
 	var ctx := RPQueryContext.new()
 	ctx.stat_name = stat_name
-	unit.fire_hook(&"get_rp_bonus", ctx)
+	unit.fire_hook(HookId.GET_RP_BONUS, ctx)
 	return base_rp + ctx.bonus_rp
 
 func _resolve_deterministic(initiator_rp: int, reactor_rp: int) -> ConditionResult:

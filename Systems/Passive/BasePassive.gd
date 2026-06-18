@@ -5,6 +5,7 @@ class_name BasePassive
 extends Resource
 
 @export var passive_name: String = "Passive"
+@export var description: String = ""
 @export var icon: Texture2D = null
 @export var is_trait: bool = false
 

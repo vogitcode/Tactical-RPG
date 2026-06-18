@@ -7,9 +7,10 @@ const BONUS: int = 3
 
 func _init() -> void:
 	passive_name = "Swift Mover"
+	description = "Grants +3 bonus move points each turn, allowing this unit to cover more ground."
 
 func get_hook_ids() -> Array[StringName]:
-	return [&"get_move_points"]
+	return [HookId.GET_MOVE_POINTS]
 
 func handle_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 	var c := ctx as MoveQueryContext

@@ -6,9 +6,10 @@ const BONUS: int = 1
 
 func _init() -> void:
 	passive_name = "Long Reach"
+	description = "Extends attack range by +1 tile, allowing strikes from further away."
 
 func get_hook_ids() -> Array[StringName]:
-	return [&"get_attack_range"]
+	return [HookId.GET_ATTACK_RANGE]
 
 func handle_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 	var c := ctx as AttackRangeQueryContext

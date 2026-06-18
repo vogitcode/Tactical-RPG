@@ -17,7 +17,7 @@ func test_reduces_damage_by_armor_value() -> void:
 	ctx.unit = _unit
 	ctx.original_amount = 10
 	ctx.modified_damage = 10
-	_passive.handle_hook(&"on_take_damage", ctx)
+	_passive.handle_hook(HookId.ON_TAKE_DAMAGE, ctx)
 	assert_eq(ctx.modified_damage, 8)
 
 func test_clamps_damage_to_zero() -> void:
@@ -25,7 +25,7 @@ func test_clamps_damage_to_zero() -> void:
 	ctx.unit = _unit
 	ctx.original_amount = 1
 	ctx.modified_damage = 1
-	_passive.handle_hook(&"on_take_damage", ctx)
+	_passive.handle_hook(HookId.ON_TAKE_DAMAGE, ctx)
 	assert_eq(ctx.modified_damage, 0)
 
 func test_wrong_context_type_is_noop() -> void:
@@ -33,7 +33,7 @@ func test_wrong_context_type_is_noop() -> void:
 	var ctx := DeathCheckContext.new()
 	ctx.unit = _unit
 	ctx.prevent_death = false
-	_passive.handle_hook(&"on_take_damage", ctx)
+	_passive.handle_hook(HookId.ON_TAKE_DAMAGE, ctx)
 	assert_false(ctx.prevent_death)
 
 # --- Integration: qua Unit.take_damage() ---

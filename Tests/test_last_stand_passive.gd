@@ -16,21 +16,21 @@ func test_sets_prevent_death_true() -> void:
 	var ctx := DeathCheckContext.new()
 	ctx.unit = _unit
 	ctx.prevent_death = false
-	_passive.handle_hook(&"on_death_check", ctx)
+	_passive.handle_hook(HookId.ON_DEATH_CHECK, ctx)
 	assert_true(ctx.prevent_death)
 
 func test_removes_itself_from_unit_after_firing() -> void:
 	var ctx := DeathCheckContext.new()
 	ctx.unit = _unit
 	ctx.prevent_death = false
-	_passive.handle_hook(&"on_death_check", ctx)
+	_passive.handle_hook(HookId.ON_DEATH_CHECK, ctx)
 
 	# Passive đã gọi remove_passive(self) — hook index đã được rebuild
 	# Bắn hook lần 2 qua unit: nếu passive còn đó sẽ set prevent_death=true
 	var ctx2 := DeathCheckContext.new()
 	ctx2.unit = _unit
 	ctx2.prevent_death = false
-	_unit.fire_hook(&"on_death_check", ctx2)
+	_unit.fire_hook(HookId.ON_DEATH_CHECK, ctx2)
 	assert_false(ctx2.prevent_death)
 
 # --- Integration: qua Unit.take_damage() ---

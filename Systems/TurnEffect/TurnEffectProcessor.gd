@@ -10,7 +10,7 @@ func on_unit_turn_start(unit: Unit, token: StateCompletionToken) -> void:
 	unit.get_status_receiver().process_turn_start(unit)
 	var ctx := TurnStartContext.new()
 	ctx.unit = unit
-	unit.fire_hook(&"on_unit_turn_start", ctx)
+	unit.fire_hook(HookId.ON_UNIT_TURN_START, ctx)
 	release.call()
 
 func on_unit_turn_end(unit: Unit, token: StateCompletionToken) -> void:

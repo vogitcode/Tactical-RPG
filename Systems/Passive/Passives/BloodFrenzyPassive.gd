@@ -15,9 +15,10 @@ extends BasePassive
 
 func _init() -> void:
 	passive_name = "Blood Frenzy"
+	description = "When rage stacks reach 3 or more, reduces incoming damage by 3. Works in tandem with Berserker."
 
 func get_hook_ids() -> Array[StringName]:
-	return [&"on_take_damage"]
+	return [HookId.ON_TAKE_DAMAGE]
 
 func handle_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 	var c := ctx as TakeDamageContext
@@ -30,4 +31,4 @@ func handle_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 		var old := c.modified_damage
 		c.modified_damage = maxi(0, c.modified_damage - damage_reduction)
 		print("[BloodFrenzy] COMPOUND ACTIVE (rage=%d) — damage %d → %d" % [stacks, old, c.modified_damage])
-		c.unit.show_active_hook_icons(&"on_take_damage")
+		c.unit.show_active_hook_icons(HookId.ON_TAKE_DAMAGE)

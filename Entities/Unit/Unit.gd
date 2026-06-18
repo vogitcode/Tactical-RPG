@@ -45,7 +45,7 @@ func _ready() -> void:
 	for passive in _runtime_passives:
 		var ctx := AttachContext.new()
 		ctx.unit = self
-		passive.handle_hook(&"on_passive_attached", ctx)
+		passive.handle_hook(HookId.ON_PASSIVE_ATTACHED, ctx)
 
 func get_status_receiver() -> StatusEffectReceiver:
 	return _status_receiver
@@ -84,7 +84,7 @@ func get_available_actions() -> Array[BaseAction]:
 			available.append(action)
 	var extra_ctx := AvailableActionsContext.new()
 	extra_ctx.unit = self
-	fire_hook(&"get_available_actions", extra_ctx)
+	fire_hook(HookId.GET_AVAILABLE_ACTIONS, extra_ctx)
 	available.append_array(extra_ctx.extra_actions)
 	return available
 
@@ -113,7 +113,7 @@ func take_damage(amount: int) -> void:
 	damage_ctx.original_amount = amount
 	damage_ctx.modified_damage = actual
 	damage_ctx.unit = self
-	fire_hook(&"on_take_damage", damage_ctx)
+	fire_hook(HookId.ON_TAKE_DAMAGE, damage_ctx)
 	actual = maxi(0, damage_ctx.modified_damage)
 
 	var old_hp := current_hp
@@ -123,7 +123,7 @@ func take_damage(amount: int) -> void:
 	if current_hp == 0:
 		var death_ctx := DeathCheckContext.new()
 		death_ctx.unit = self
-		fire_hook(&"on_death_check", death_ctx)
+		fire_hook(HookId.ON_DEATH_CHECK, death_ctx)
 		if death_ctx.prevent_death:
 			current_hp = 1
 			hp_changed.emit(0, 1)
@@ -176,12 +176,12 @@ func add_passive(passive: BasePassive) -> void:
 	_rebuild_hook_index()
 	var ctx := AttachContext.new()
 	ctx.unit = self
-	passive.handle_hook(&"on_passive_attached", ctx)
+	passive.handle_hook(HookId.ON_PASSIVE_ATTACHED, ctx)
 
 func remove_passive(passive: BasePassive) -> void:
 	var ctx := DetachContext.new()
 	ctx.unit = self
-	passive.handle_hook(&"on_passive_detached", ctx)
+	passive.handle_hook(HookId.ON_PASSIVE_DETACHED, ctx)
 	_runtime_passives.erase(passive)
 	_rebuild_hook_index()
 
@@ -206,12 +206,12 @@ func fire_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 func get_effective_move_points() -> int:
 	var ctx := MoveQueryContext.new()
 	ctx.unit = self
-	fire_hook(&"get_move_points", ctx)
+	fire_hook(HookId.GET_MOVE_POINTS, ctx)
 	return move_points + ctx.bonus_move_points
 
 func get_effective_attack_range(base: int) -> int:
 	var ctx := AttackRangeQueryContext.new()
-	fire_hook(&"get_attack_range", ctx)
+	fire_hook(HookId.GET_ATTACK_RANGE, ctx)
 	return base + ctx.bonus_range
 
 ## Shows the icon of every passive registered for hook_id above the unit.

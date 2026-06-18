@@ -1,4 +1,4 @@
-## Fires the &"on_combat_resolved" hook on both combatants after each BattleProcess.
+## Fires the HookId.ON_COMBAT_RESOLVED hook on both combatants after each BattleProcess.
 ## Lives as a child Node of CombatSystem; called from _drain() after _run_process().
 ## Future: may also enqueue counter-attack BattleProcesses here.
 class_name PassiveScanner
@@ -15,8 +15,8 @@ func scan(process: BattleProcess) -> void:
 	ctx.condition_result = process.condition_result
 
 	ctx.firing_unit = process.source_unit
-	process.source_unit.fire_hook(&"on_combat_resolved", ctx)
+	process.source_unit.fire_hook(HookId.ON_COMBAT_RESOLVED, ctx)
 
 	if process.reactor_unit != null and process.reactor_unit.is_alive():
 		ctx.firing_unit = process.reactor_unit
-		process.reactor_unit.fire_hook(&"on_combat_resolved", ctx)
+		process.reactor_unit.fire_hook(HookId.ON_COMBAT_RESOLVED, ctx)
