@@ -31,7 +31,7 @@ func _physics_process(_delta: float) -> void:
 # Connects systems inside SystemManager with UI nodes that live outside it.
 
 func _wire_cross_boundary() -> void:
-	_health_ui_manager.setup(system_manager.unit_manager)
+	system_manager.unit_manager.unit_spawned.connect(_health_ui_manager.register_unit)
 
 	system_manager.action_system.show_menu_requested.connect(_action_menu.show_for_unit)
 	_action_menu.action_chosen.connect(system_manager.action_system.on_action_chosen)

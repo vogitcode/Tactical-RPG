@@ -15,12 +15,14 @@ extends Node
 func _ready() -> void:
 	system_manager.initialize()
 	_wire_cross_boundary()
+	system_manager.load_map_data(Battle1aLayout.build())
 	system_manager.start_battle()
 
 # --- Cross-boundary wiring ---
 
 func _wire_cross_boundary() -> void:
-	_health_ui_manager.setup(system_manager.unit_manager)
+	system_manager.unit_manager.unit_spawned.connect(_health_ui_manager.register_unit)
+	system_manager.unit_manager.clone_expired.connect(_health_ui_manager.unregister_unit)
 
 	# Ability bar replaces ActionMenu — wire show_menu_requested to update HUD instead
 	system_manager.action_system.show_menu_requested.connect(_on_active_unit_ready)

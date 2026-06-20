@@ -12,6 +12,7 @@ const ON_TAKE_DAMAGE        := &"on_take_damage"
 const ON_DEATH_CHECK        := &"on_death_check"
 const ON_BEFORE_DEAL_DAMAGE := &"on_before_deal_damage"
 const ON_UNIT_TURN_START    := &"on_unit_turn_start"
+const ON_UNIT_TURN_END      := &"on_unit_turn_end"
 const ON_COMBAT_RESOLVED    := &"on_combat_resolved"
 const ON_DASH_EXECUTED      := &"on_dash_executed"
 

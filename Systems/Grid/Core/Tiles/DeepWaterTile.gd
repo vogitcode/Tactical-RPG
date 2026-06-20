@@ -6,5 +6,5 @@ func _init() -> void:
 	movement_cost = 1
 	blocks_movement = true
 	blocks_los = false
-	atlas_source_id = 1
-	atlas_coords = Vector2i(0, 10)  # placeholder — update when deep water atlas row confirmed
+	atlas_source_id = 2  # tileset 32x32.png
+	atlas_coords = Vector2i(0, 0)  # top-left = dark navy blue

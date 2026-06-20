@@ -9,9 +9,8 @@ func _init() -> void:
 	hazard_cost = 5   # A* prefers to route around fire; actual MP cost remains 1
 	blocks_movement = false
 	blocks_los = false
-	atlas_source_id = 0
-	# Placeholder coords — update to the actual fire/lava cell in tiles.png once identified.
-	atlas_coords = Vector2i(1, 18)
+	atlas_source_id = 2  # tileset 32x32.png
+	atlas_coords = Vector2i(0, 1)  # bottom-left = red
 
 func on_unit_enter(unit: Node, _grid_pos: Vector2i) -> void:
 	_apply_fire(unit)

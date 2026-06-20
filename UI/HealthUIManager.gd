@@ -1,7 +1,7 @@
 ## Manages world-space HP bar and name label displays for all units.
 ## Lives as a Node2D in the main scene — NOT under CanvasLayer — so displays
 ## follow units in world space and zoom correctly with the camera.
-## Wired by the Compositor (Demo.gd) via setup().
+## Wired by the Compositor via unit_manager.unit_spawned.connect(register_unit).
 class_name HealthUIManager
 extends Node2D
 
@@ -13,12 +13,9 @@ const LABEL_OFFSET := Vector2(-HP_BAR_WIDTH / 2.0, -22.0)
 # unit -> { root: Node2D, fill: ColorRect }
 var _displays: Dictionary = {}
 
-func setup(unit_manager: UnitManager) -> void:
-	unit_manager.unit_spawned.connect(_on_unit_spawned)
-	for unit in unit_manager.get_all_units():
-		_on_unit_spawned(unit)
-
-func _on_unit_spawned(unit: Unit) -> void:
+## Called by compositor for each spawned unit (including mid-battle spawns).
+## Compositor wires: unit_manager.unit_spawned.connect(health_ui_manager.register_unit)
+func register_unit(unit: Unit) -> void:
 	var root := Node2D.new()
 	add_child(root)
 
@@ -60,6 +57,12 @@ func _on_hp_changed(_old_hp: int, _new_hp: int, unit: Unit) -> void:
 	var ratio := float(unit.current_hp) / float(unit.max_hp)
 	fill.size.x = HP_BAR_WIDTH * ratio
 	fill.color = Color(0.2, 0.8, 0.2).lerp(Color(0.8, 0.1, 0.1), 1.0 - ratio)
+
+func unregister_unit(unit: Unit) -> void:
+	if not _displays.has(unit):
+		return
+	_displays[unit].root.queue_free()
+	_displays.erase(unit)
 
 func _on_unit_died(unit: Unit) -> void:
 	if _displays.has(unit):

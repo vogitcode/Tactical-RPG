@@ -80,6 +80,26 @@ func defer_unit(unit: Unit) -> void:
 	if not _deferred_units.has(unit):
 		_deferred_units.append(unit)
 
+## Add a unit spawned mid-battle (e.g. by CloneAbility).
+## Unit joins turn order starting from the next faction cycle.
+func add_unit(unit: Unit) -> void:
+	_units.append(unit)
+	if not faction_order.has(unit.team):
+		faction_order.append(unit.team)
+		faction_order.sort()
+
+## Remove a unit from all turn-tracking arrays.
+## Called for clean removals (clone expiry) and on unit_died to keep queues clean.
+func remove_unit(unit: Unit) -> void:
+	_units.erase(unit)
+	_completed_units.erase(unit)
+	_deferred_units.erase(unit)
+
+## Wired to unit_manager.unit_died — removes dead units from the turn queue
+## so no dead unit ever starts a new turn.
+func on_unit_died(unit: Unit) -> void:
+	remove_unit(unit)
+
 ## Called by GoalSystem when a win/lose condition is met.
 ## State machine exits cleanly at the next state boundary.
 func trigger_battle_end(result: StringName) -> void:

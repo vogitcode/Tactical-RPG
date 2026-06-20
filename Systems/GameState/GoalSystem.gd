@@ -13,9 +13,8 @@ var _unit_manager: UnitManager = null
 
 func setup(unit_manager: UnitManager) -> void:
 	_unit_manager = unit_manager
-	unit_manager.unit_died.connect(_on_unit_died)
 
-func _on_unit_died(_unit: Unit) -> void:
+func on_unit_died(_unit: Unit) -> void:
 	_evaluate_conditions()
 
 func _evaluate_conditions() -> void:

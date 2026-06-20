@@ -27,8 +27,9 @@ const GRID_LINE_COLOR := Color(0.0, 0.0, 0.0, 0.25)
 const GRID_LINE_WIDTH := 0.8
 
 # TileSet source IDs — must match the order sources are added in _build_tile_set().
-const TILES_SOURCE_ID := 0   # tiles.png
-const ANIM_SOURCE_ID   := 1  # animated-tiles.png
+const TILES_SOURCE_ID   := 0  # tiles.png
+const ANIM_SOURCE_ID    := 1  # animated-tiles.png
+const CUSTOM_SOURCE_ID  := 2  # tileset 32x32.png (fire, deepwater, corruption, void)
 
 const PATH_LINE_COLOR := Color(1.0, 1.0, 1.0, 0.90)
 const PATH_LINE_WIDTH := 3.0
@@ -43,6 +44,7 @@ var _tile_map: TileMapLayer = null
 var _tile_set: TileSet = null
 var _tiles_source: TileSetAtlasSource = null
 var _anim_source: TileSetAtlasSource = null
+var _custom_source: TileSetAtlasSource = null
 
 func setup(grid_data: GridData, adapter: GridCoordinateAdapter) -> void:
 	_grid_data = grid_data
@@ -167,6 +169,11 @@ func _build_tile_set() -> void:
 	_anim_source.texture = load("res://Assets/Character and Tile/32rogues/animated-tiles.png")
 	_anim_source.texture_region_size = Vector2i(32, 32)
 	_tile_set.add_source(_anim_source, ANIM_SOURCE_ID)
+
+	_custom_source = TileSetAtlasSource.new()
+	_custom_source.texture = load("res://Assets/Character and Tile/Tileset/tileset 32x32.png")
+	_custom_source.texture_region_size = Vector2i(32, 32)
+	_tile_set.add_source(_custom_source, CUSTOM_SOURCE_ID)
 
 func _create_tile_map() -> void:
 	_tile_map = TileMapLayer.new()

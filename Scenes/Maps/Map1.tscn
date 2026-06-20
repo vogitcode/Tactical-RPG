@@ -36,6 +36,7 @@
 [ext_resource type="Script" uid="uid://cxxdwhq3ljyih" path="res://Systems/AI/Brains/BanditBrain.gd" id="33_bb"]
 [ext_resource type="Script" path="res://Systems/Zone/ZoneProcessor.gd" id="zp"]
 [ext_resource type="Script" path="res://Systems/Prop/PropSystem.gd" id="ps"]
+[ext_resource type="Script" path="res://Systems/Ability/AbilitySystem.gd" id="ability_sys"]
 [ext_resource type="Script" uid="uid://c53h6q12kqfo6" path="res://Systems/Action/Interaction/PlayerInteractionStateMachine.gd" id="pism"]
 [ext_resource type="Script" uid="uid://bojsfptbo2003" path="res://Systems/Action/Interaction/States/IdleInteractionState.gd" id="idle_is"]
 [ext_resource type="Script" uid="uid://df5van5pqrj78" path="res://Systems/Action/Interaction/States/MenuOpenInteractionState.gd" id="menu_is"]
@@ -138,6 +139,9 @@ script = ExtResource("31_ee")
 
 [node name="PassiveScanner" type="Node" parent="SystemManager/ActionHolder/CombatSystem"]
 script = ExtResource("32_ps")
+
+[node name="AbilitySystem" type="Node" parent="SystemManager/ActionHolder"]
+script = ExtResource("ability_sys")
 
 [node name="ReactionSystem" type="Node" parent="SystemManager"]
 script = ExtResource("6")

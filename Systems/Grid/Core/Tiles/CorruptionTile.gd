@@ -7,5 +7,5 @@ func _init() -> void:
 	hazard_cost = 3   # slow AND dangerous — A* avoids unless no alternative
 	blocks_movement = false
 	blocks_los = false
-	atlas_source_id = 0
-	atlas_coords = Vector2i(2, 16)  # row 16, last of the 3 terrain columns
+	atlas_source_id = 2  # tileset 32x32.png
+	atlas_coords = Vector2i(1, 0)  # top-right = dark purple

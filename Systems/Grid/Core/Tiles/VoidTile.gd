@@ -6,5 +6,5 @@ func _init() -> void:
 	movement_cost = 1
 	blocks_movement = true
 	blocks_los = true
-	atlas_source_id = 0
-	atlas_coords = Vector2i(0, 11)  # very dark row
+	atlas_source_id = 2  # tileset 32x32.png
+	atlas_coords = Vector2i(1, 1)  # bottom-right = black (abyss)

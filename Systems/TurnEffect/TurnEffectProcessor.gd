@@ -15,5 +15,7 @@ func on_unit_turn_start(unit: Unit, token: StateCompletionToken) -> void:
 
 func on_unit_turn_end(unit: Unit, token: StateCompletionToken) -> void:
 	var release := token.claim()
-	# Future: end-of-turn passive triggers, reaction cooldown tracking
+	var ctx := TurnEndContext.new()
+	ctx.unit = unit
+	unit.fire_hook(HookId.ON_UNIT_TURN_END, ctx)
 	release.call()
