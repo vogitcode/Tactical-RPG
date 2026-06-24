@@ -59,6 +59,8 @@ func _create_unit(data: UnitData, team: int) -> Unit:
 			Rect2(data.atlas_cell.x * 32, data.atlas_cell.y * 32, 32, 32)
 		)
 	unit.unit_died.connect(_on_unit_died.bind(unit))
+	for cap in data.initial_capabilities:
+		unit.set_capability(cap, true)
 	return unit
 
 func get_all_units() -> Array[Unit]:

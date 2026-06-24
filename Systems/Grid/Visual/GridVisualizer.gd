@@ -188,10 +188,9 @@ func _rebuild_tile_map() -> void:
 	for x in range(_grid_data.width):
 		for y in range(_grid_data.height):
 			var grid_pos := Vector2i(x, y)
-			var cell := _grid_data.get_cell(grid_pos)
-			if cell == null or cell.tile == null:
+			var tile := _grid_data.get_tile(grid_pos)
+			if tile == null:
 				continue
-			var tile := cell.tile
 			if tile.atlas_coords == Vector2i(-1, -1):
 				continue
 			_ensure_tile_registered(tile.atlas_source_id, tile.atlas_coords)

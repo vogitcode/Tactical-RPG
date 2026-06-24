@@ -7,7 +7,6 @@ func _init() -> void:
 	base_color = Color(1.0, 0.45, 0.0)
 	movement_cost = 1
 	hazard_cost = 5   # A* prefers to route around fire; actual MP cost remains 1
-	blocks_movement = false
 	blocks_los = false
 	atlas_source_id = 2  # tileset 32x32.png
 	atlas_coords = Vector2i(0, 1)  # bottom-left = red

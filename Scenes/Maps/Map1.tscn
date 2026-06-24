@@ -1,6 +1,5 @@
-[gd_scene format=3 uid="uid://bmap1tutorial1"]
+[gd_scene format=3 uid="uid://dq8hc8pwkanam"]
 
-[ext_resource type="Script" path="res://Scenes/Maps/Map1.gd" id="map1"]
 [ext_resource type="Script" uid="uid://d2hsh67f6mwnf" path="res://Scenes/Demo/SystemManager.gd" id="2"]
 [ext_resource type="Script" uid="uid://4eytyuk6fvc" path="res://Systems/Grid/GridSystem.gd" id="3"]
 [ext_resource type="Script" uid="uid://bbi68sc2bfof" path="res://Systems/Turn/TurnSystem.gd" id="4"]
@@ -34,17 +33,19 @@
 [ext_resource type="Script" uid="uid://docai4f7wgj3x" path="res://Systems/AI/AISystem.gd" id="32_ai"]
 [ext_resource type="Script" uid="uid://b67muamogbexq" path="res://Systems/Battle/PassiveScanner.gd" id="32_ps"]
 [ext_resource type="Script" uid="uid://cxxdwhq3ljyih" path="res://Systems/AI/Brains/BanditBrain.gd" id="33_bb"]
-[ext_resource type="Script" path="res://Systems/Zone/ZoneProcessor.gd" id="zp"]
-[ext_resource type="Script" path="res://Systems/Prop/PropSystem.gd" id="ps"]
-[ext_resource type="Script" path="res://Systems/Ability/AbilitySystem.gd" id="ability_sys"]
-[ext_resource type="Script" uid="uid://c53h6q12kqfo6" path="res://Systems/Action/Interaction/PlayerInteractionStateMachine.gd" id="pism"]
+[ext_resource type="Script" uid="uid://bfethnfr2msn0" path="res://Systems/Ability/AbilitySystem.gd" id="ability_sys"]
 [ext_resource type="Script" uid="uid://bojsfptbo2003" path="res://Systems/Action/Interaction/States/IdleInteractionState.gd" id="idle_is"]
+[ext_resource type="Script" uid="uid://dkoxsx5vrodmp" path="res://Scenes/Maps/Map1.gd" id="map1"]
 [ext_resource type="Script" uid="uid://df5van5pqrj78" path="res://Systems/Action/Interaction/States/MenuOpenInteractionState.gd" id="menu_is"]
+[ext_resource type="Script" uid="uid://c53h6q12kqfo6" path="res://Systems/Action/Interaction/PlayerInteractionStateMachine.gd" id="pism"]
+[ext_resource type="Script" uid="uid://bes4l8lwter51" path="res://Systems/Prop/PropSystem.gd" id="ps"]
+[ext_resource type="Script" uid="uid://ca33f0pneiv14" path="res://Systems/Grid/Visual/PropVisualizer.gd" id="pv"]
 [ext_resource type="Script" uid="uid://xquqkbbiexa5" path="res://Systems/Action/Interaction/States/TargetingInteractionState.gd" id="targ_is"]
-[ext_resource type="Script" path="res://UI/UnitStatsPanel.gd" id="ui_stats"]
-[ext_resource type="Script" path="res://UI/AbilityBar.gd" id="ui_bar"]
-[ext_resource type="Script" path="res://UI/TurnOrderPanel.gd" id="ui_turn"]
-[ext_resource type="Script" path="res://UI/DescriptionTooltip.gd" id="ui_tip"]
+[ext_resource type="Script" uid="uid://iwbr6ebscuuc" path="res://UI/AbilityBar.gd" id="ui_bar"]
+[ext_resource type="Script" uid="uid://burcdp8evkvgo" path="res://UI/UnitStatsPanel.gd" id="ui_stats"]
+[ext_resource type="Script" uid="uid://dbfrgjqeapcwk" path="res://UI/DescriptionTooltip.gd" id="ui_tip"]
+[ext_resource type="Script" uid="uid://dtsw5ob4yh46f" path="res://UI/TurnOrderPanel.gd" id="ui_turn"]
+[ext_resource type="Script" uid="uid://ykj7md603ya6" path="res://Systems/Zone/ZoneProcessor.gd" id="zp"]
 
 [sub_resource type="Resource" id="Resource_1fkkg"]
 script = ExtResource("17_1fkkg")
@@ -55,141 +56,143 @@ script = ExtResource("17_1fkkg")
 category = &"combat"
 timeout_sec = 15.0
 
-[node name="Map1" type="Node"]
+[node name="Map1" type="Node" unique_id=1931051057]
 script = ExtResource("map1")
 
-[node name="SystemManager" type="Node2D" parent="."]
+[node name="SystemManager" type="Node2D" parent="." unique_id=1274020]
 script = ExtResource("2")
 
-[node name="GridSystem" type="Node" parent="SystemManager"]
+[node name="GridSystem" type="Node" parent="SystemManager" unique_id=1604399998]
 script = ExtResource("3")
 
-[node name="GridVisualizer" type="Node2D" parent="SystemManager/GridSystem"]
+[node name="GridVisualizer" type="Node2D" parent="SystemManager/GridSystem" unique_id=709943234]
 script = ExtResource("15")
 
-[node name="TurnSystem" type="Node" parent="SystemManager"]
+[node name="PropVisualizer" type="Node2D" parent="SystemManager/GridSystem/GridVisualizer" unique_id=786414660]
+script = ExtResource("pv")
+
+[node name="TurnSystem" type="Node" parent="SystemManager" unique_id=41956692]
 script = ExtResource("4")
 
-[node name="BattleStartState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="BattleStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=901852456]
 script = ExtResource("16")
 
-[node name="TurnStartState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="TurnStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=1908603987]
 script = ExtResource("17")
 
-[node name="FactionTurnStartState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="FactionTurnStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=773773172]
 script = ExtResource("18")
 
-[node name="UnitTurnStartState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="UnitTurnStartState" type="Node" parent="SystemManager/TurnSystem" unique_id=1949059013]
 script = ExtResource("19")
 
-[node name="UnitActingState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="UnitActingState" type="Node" parent="SystemManager/TurnSystem" unique_id=1387352773]
 script = ExtResource("20")
 timeout_sec = 0.0
 
-[node name="UnitTurnEndState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="UnitTurnEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=1154978549]
 script = ExtResource("21")
 
-[node name="FactionTurnEndState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="FactionTurnEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=1877615838]
 script = ExtResource("22")
 
-[node name="TurnEndState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="TurnEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=362114139]
 script = ExtResource("23")
 
-[node name="BattleEndState" type="Node" parent="SystemManager/TurnSystem"]
+[node name="BattleEndState" type="Node" parent="SystemManager/TurnSystem" unique_id=2065877830]
 script = ExtResource("24")
 
-[node name="ActionHolder" type="Node" parent="SystemManager"]
+[node name="ActionHolder" type="Node" parent="SystemManager" unique_id=1332561170]
 
-[node name="InterruptManager" type="Node" parent="SystemManager/ActionHolder"]
+[node name="InterruptManager" type="Node" parent="SystemManager/ActionHolder" unique_id=942004528]
 script = ExtResource("11")
 watchdog_configs = Array[ExtResource("17_1fkkg")]([SubResource("Resource_1fkkg"), SubResource("Resource_cf7pk")])
 
-[node name="ActionSystem" type="Node" parent="SystemManager/ActionHolder"]
+[node name="ActionSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=1870625989]
 script = ExtResource("5")
 
-[node name="PlayerInteractionStateMachine" type="Node" parent="SystemManager/ActionHolder/ActionSystem"]
+[node name="PlayerInteractionStateMachine" type="Node" parent="SystemManager/ActionHolder/ActionSystem" unique_id=1225765146]
 script = ExtResource("pism")
 
-[node name="IdleInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine"]
+[node name="IdleInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine" unique_id=745957637]
 script = ExtResource("idle_is")
-phase = 0
 
-[node name="MenuOpenInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine"]
+[node name="MenuOpenInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine" unique_id=1606000430]
 script = ExtResource("menu_is")
 phase = 1
 
-[node name="TargetingInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine"]
+[node name="TargetingInteractionState" type="Node" parent="SystemManager/ActionHolder/ActionSystem/PlayerInteractionStateMachine" unique_id=41698893]
 script = ExtResource("targ_is")
 phase = 2
 
-[node name="MoveSystem" type="Node" parent="SystemManager/ActionHolder"]
+[node name="MoveSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=1775868144]
 script = ExtResource("8")
 
-[node name="CombatSystem" type="Node" parent="SystemManager/ActionHolder"]
+[node name="CombatSystem" type="Node" parent="SystemManager/ActionHolder" unique_id=1797348810]
 script = ExtResource("28_cs")
 
-[node name="ReactionCollector" type="Node" parent="SystemManager/ActionHolder/CombatSystem"]
+[node name="ReactionCollector" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=590945447]
 script = ExtResource("29_rc")
 
-[node name="Arbitrator" type="Node" parent="SystemManager/ActionHolder/CombatSystem"]
+[node name="Arbitrator" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=1120705379]
 script = ExtResource("30_arb")
 
-[node name="EffectExecutor" type="Node" parent="SystemManager/ActionHolder/CombatSystem"]
+[node name="EffectExecutor" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=728710432]
 script = ExtResource("31_ee")
 
-[node name="PassiveScanner" type="Node" parent="SystemManager/ActionHolder/CombatSystem"]
+[node name="PassiveScanner" type="Node" parent="SystemManager/ActionHolder/CombatSystem" unique_id=1499772127]
 script = ExtResource("32_ps")
 
-[node name="AbilitySystem" type="Node" parent="SystemManager/ActionHolder"]
+[node name="AbilitySystem" type="Node" parent="SystemManager/ActionHolder" unique_id=590761424]
 script = ExtResource("ability_sys")
 
-[node name="ReactionSystem" type="Node" parent="SystemManager"]
+[node name="ReactionSystem" type="Node" parent="SystemManager" unique_id=374523623]
 script = ExtResource("6")
 
-[node name="InputSystem" type="Node" parent="SystemManager"]
+[node name="InputSystem" type="Node" parent="SystemManager" unique_id=742392751]
 script = ExtResource("9")
 
-[node name="UnitManager" type="Node" parent="SystemManager"]
+[node name="UnitManager" type="Node" parent="SystemManager" unique_id=1764408816]
 script = ExtResource("10")
 
-[node name="GoalSystem" type="Node" parent="SystemManager"]
+[node name="GoalSystem" type="Node" parent="SystemManager" unique_id=955370511]
 script = ExtResource("25")
 
-[node name="TurnEffectProcessor" type="Node" parent="SystemManager"]
+[node name="TurnEffectProcessor" type="Node" parent="SystemManager" unique_id=264215735]
 script = ExtResource("26")
 
-[node name="ProcessMonitor" type="Node" parent="SystemManager"]
+[node name="ProcessMonitor" type="Node" parent="SystemManager" unique_id=934382513]
 script = ExtResource("27")
 
-[node name="AISystem" type="Node" parent="SystemManager"]
+[node name="AISystem" type="Node" parent="SystemManager" unique_id=247850974]
 script = ExtResource("32_ai")
 
-[node name="BanditBrain" type="Node" parent="SystemManager/AISystem"]
+[node name="BanditBrain" type="Node" parent="SystemManager/AISystem" unique_id=1130467698]
 script = ExtResource("33_bb")
 faction_id = 1
 
-[node name="ZoneProcessor" type="Node" parent="SystemManager"]
+[node name="ZoneProcessor" type="Node" parent="SystemManager" unique_id=420772884]
 script = ExtResource("zp")
 
-[node name="PropSystem" type="Node" parent="SystemManager"]
+[node name="PropSystem" type="Node" parent="SystemManager" unique_id=2001659056]
 script = ExtResource("ps")
 
-[node name="WorldUIManager" type="Node2D" parent="."]
+[node name="WorldUIManager" type="Node2D" parent="." unique_id=1901635415]
 
-[node name="HealthUIManager" type="Node2D" parent="WorldUIManager"]
+[node name="HealthUIManager" type="Node2D" parent="WorldUIManager" unique_id=1996027846]
 script = ExtResource("14")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=757641521]
 
-[node name="ScreenUIManager" type="Node" parent="UI"]
+[node name="ScreenUIManager" type="Node" parent="UI" unique_id=439666627]
 script = ExtResource("13")
 
-[node name="ActionMenu" type="Control" parent="UI/ScreenUIManager"]
+[node name="ActionMenu" type="Control" parent="UI/ScreenUIManager" unique_id=2095451989]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("7")
 
-[node name="StatusLabel" type="Label" parent="UI"]
+[node name="StatusLabel" type="Label" parent="UI" unique_id=2084936330]
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 700.0
@@ -197,11 +200,10 @@ offset_bottom = 36.0
 theme_override_font_sizes/font_size = 14
 text = "Turn: —"
 
-[node name="UnitStatsPanel" type="Control" parent="UI"]
+[node name="UnitStatsPanel" type="Control" parent="UI" unique_id=1228446857]
 layout_mode = 3
-anchor_left = 0.0
+anchors_preset = 2
 anchor_top = 1.0
-anchor_right = 0.0
 anchor_bottom = 1.0
 offset_left = 10.0
 offset_top = -130.0
@@ -209,8 +211,9 @@ offset_right = 190.0
 offset_bottom = -10.0
 script = ExtResource("ui_stats")
 
-[node name="AbilityBar" type="Control" parent="UI"]
+[node name="AbilityBar" type="Control" parent="UI" unique_id=325443437]
 layout_mode = 3
+anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -221,21 +224,20 @@ offset_right = 210.0
 offset_bottom = -10.0
 script = ExtResource("ui_bar")
 
-[node name="TurnOrderPanel" type="Control" parent="UI"]
+[node name="TurnOrderPanel" type="Control" parent="UI" unique_id=1179092925]
 layout_mode = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
 offset_left = -400.0
 offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 50.0
 script = ExtResource("ui_turn")
 
-[node name="DescriptionTooltip" type="Control" parent="UI"]
+[node name="DescriptionTooltip" type="Control" parent="UI" unique_id=1787690369]
+z_index = 100
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
-z_index = 100
 script = ExtResource("ui_tip")

@@ -12,32 +12,32 @@
 [ext_resource type="Script" uid="uid://d2o8y3bfudic8" path="res://Systems/Passive/BasePassive.gd" id="9"]
 [ext_resource type="Script" uid="uid://bd162t2g7n64f" path="res://Systems/Passive/Passives/SwiftMoverPassive.gd" id="10"]
 [ext_resource type="Texture2D" uid="uid://dy2vva02bbipq" path="res://Assets/Icon/fb593.png" id="11"]
-[ext_resource type="Script" path="res://Systems/Ability/Abilities/CloneAbility.gd" id="clone_ab"]
+[ext_resource type="Script" uid="uid://nv3q0j6a2t0c" path="res://Systems/Ability/Abilities/CloneAbility.gd" id="clone_ab"]
 
-[sub_resource type="Resource" id="Resource_1"]
+[sub_resource type="Resource" id="Resource_madg8"]
 script = ExtResource("2")
 
-[sub_resource type="Resource" id="Resource_2"]
+[sub_resource type="Resource" id="Resource_fn2wo"]
 script = ExtResource("3")
 
-[sub_resource type="Resource" id="Resource_3"]
+[sub_resource type="Resource" id="Resource_gqp28"]
 script = ExtResource("4")
 
-[sub_resource type="Resource" id="Resource_4"]
+[sub_resource type="Resource" id="Resource_fjt2b"]
 script = ExtResource("5")
 
-[sub_resource type="Resource" id="Resource_5"]
+[sub_resource type="Resource" id="Resource_37fh8"]
 script = ExtResource("6")
 
-[sub_resource type="Resource" id="Resource_clone"]
+[sub_resource type="Resource" id="Resource_qd8e4"]
 script = ExtResource("clone_ab")
 
-[sub_resource type="Resource" id="Resource_swift"]
+[sub_resource type="Resource" id="Resource_knyb8"]
 script = ExtResource("10")
 passive_name = "Swift Mover"
 icon = ExtResource("11")
 
-[sub_resource type="Resource" id="Resource_41d2k"]
+[sub_resource type="Resource" id="Resource_2xxye"]
 script = ExtResource("8")
 base_rp = 15
 
@@ -46,6 +46,6 @@ script = ExtResource("1")
 unit_name = "Knight"
 attack_damage = 6
 atlas_cell = Vector2i(0, 1)
-actions = Array[ExtResource("1_5l2hy")]([SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_5"), SubResource("Resource_clone")])
-reactions = Array[ExtResource("7")]([SubResource("Resource_41d2k")])
-passives = Array[ExtResource("9")]([SubResource("Resource_swift")])
+actions = Array[ExtResource("1_5l2hy")]([SubResource("Resource_madg8"), SubResource("Resource_fn2wo"), SubResource("Resource_gqp28"), SubResource("Resource_fjt2b"), SubResource("Resource_37fh8"), SubResource("Resource_qd8e4")])
+reactions = Array[ExtResource("7")]([SubResource("Resource_2xxye")])
+passives = Array[ExtResource("9")]([SubResource("Resource_knyb8")])

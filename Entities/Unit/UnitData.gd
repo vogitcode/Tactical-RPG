@@ -14,3 +14,5 @@ extends Resource
 @export var actions: Array[BaseAction] = []
 @export var reactions: Array[BaseReaction] = []
 @export var passives: Array[BasePassive] = []
+## Capabilities set to true on spawn. Used for unit-type traits (e.g. trap_immunity, can_fly).
+@export var initial_capabilities: Array[StringName] = []

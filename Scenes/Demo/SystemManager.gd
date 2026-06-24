@@ -92,6 +92,14 @@ func _wire_systems() -> void:
 	_move_system.unit_stepped.connect(prop_system._on_unit_stepped)
 	turn_system.unit_turn_started.connect(prop_system._on_unit_turn_started)
 	unit_manager.unit_died.connect(prop_system._on_unit_died)
+	prop_system.prop_removed.connect(grid_system.prop_visualizer.remove_at)
+
+	var trap_check := TrapAbortCheck.new()
+	prop_system.set_trap_abort_check(trap_check)
+	_move_system.move_execution_started.connect(func(ctx: MoveExecutionContext) -> void:
+		trap_check.reset()
+		ctx.register(trap_check)
+	)
 
 	input_system.tile_clicked.connect(grid_system.on_tile_clicked)
 	input_system.tile_hovered.connect(grid_system.on_tile_hovered)
@@ -137,6 +145,7 @@ func _place_props(map_data: MapData) -> void:
 		var prop: BaseProp = entry["prop"]
 		var cell: Vector2i = entry["cell"]
 		prop_system.place_prop(prop, cell)
+		grid_system.prop_visualizer.place(cell, prop)
 		if entry.get("highlight", true):
 			grid_system.visualizer.highlight_cells([cell], GridVisualizer.HighlightType.DANGER)
 

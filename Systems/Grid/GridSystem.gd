@@ -14,6 +14,7 @@ var _adapter: TopDownGridAdapter
 var _extra_passable_checks: Array[Callable] = []
 
 @onready var visualizer: GridVisualizer = $GridVisualizer
+@onready var prop_visualizer: PropVisualizer = $GridVisualizer/PropVisualizer
 
 func _ready() -> void:
 	if config == null:
@@ -21,6 +22,7 @@ func _ready() -> void:
 	_adapter = TopDownGridAdapter.new(config)
 	data = GridData.new(config)
 	visualizer.setup(data, _adapter)
+	prop_visualizer.setup(config.cell_size)
 
 # --- Map setup ---
 
@@ -62,7 +64,7 @@ func move_unit(unit: Unit, to: Vector2i) -> void:
 func register_passable_check(check: Callable) -> void:
 	_extra_passable_checks.append(check)
 
-## Generic passable override — no unit, uses tile.blocks_movement + occupant.
+## Generic passable override — no unit, uses tile.passable + occupant.
 func _build_passable_override() -> Callable:
 	if _extra_passable_checks.is_empty():
 		return Callable()
@@ -71,9 +73,9 @@ func _build_passable_override() -> Callable:
 		for c in checks:
 			if c.call(pos):
 				return false
-		return data.is_passable(pos)
+		return data.is_passable_tile(pos) and not is_occupied(pos)
 
-## Traversal override for BFS mid-expansion — unit-aware tile check + friendly occupant allowed.
+## Traversal override for BFS mid-expansion — capability-aware tile check + friendly occupant allowed.
 ## Enemy-occupied cells block expansion by default.
 func _build_traversal_override(unit: Unit) -> Callable:
 	var checks := _extra_passable_checks.duplicate()
@@ -81,7 +83,7 @@ func _build_traversal_override(unit: Unit) -> Callable:
 		for c in checks:
 			if c.call(pos):
 				return false
-		if not data.is_passable_ignore_occupant_for(pos, unit):
+		if not unit.can_traverse(data.get_tile(pos)):
 			return false
 		var occ := data.get_occupant(pos) as Unit
 		if occ == null:
@@ -96,7 +98,7 @@ func get_reachable_cells(from: Vector2i, move_points: int, unit: Unit = null) ->
 		# Post-filter: unit cannot end turn on an occupied cell
 		var destinations: Array[Vector2i] = []
 		for pos in all_cells:
-			if data.get_occupant(pos) == null:
+			if not is_occupied(pos):
 				destinations.append(pos)
 		return destinations
 	return GridLogic.get_reachable_cells(data, from, move_points, _build_passable_override())
@@ -128,11 +130,14 @@ func get_nearest_in_range(from: Vector2i, toward: Vector2i, min_r: int, max_r: i
 func get_occupant(pos: Vector2i) -> Unit:
 	return data.get_occupant(pos) as Unit
 
+func is_occupied(pos: Vector2i) -> bool:
+	return data.get_occupant(pos) != null
+
 func is_valid(pos: Vector2i) -> bool:
 	return data.is_valid(pos)
 
 func is_passable(pos: Vector2i) -> bool:
-	return data.is_passable(pos)
+	return data.is_passable_tile(pos) and not is_occupied(pos)
 
 # --- Highlight shortcuts ---
 

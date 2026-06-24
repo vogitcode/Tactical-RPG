@@ -14,16 +14,18 @@ extends Resource
 ## Gameplay defaults — override in subclasses via _init or @export in Inspector.
 @export var movement_cost: int = 1
 @export var hazard_cost: int = 0   # A* routing penalty — does not affect actual MP deduction
-@export var blocks_movement: bool = false
+@export var passable: bool = true
 @export var blocks_los: bool = false
+## If non-empty, unit must have this capability to traverse. Checked by Unit.can_traverse().
+@export var required_capability: StringName = &""
 
 # --- Virtual interface ---
 # Unit params are typed as Node (not Unit) to keep the Core layer free of
-# Entity dependencies — the same convention as CellData.occupant: Node.
+# Entity dependencies — GridData._units stores Node, GridSystem casts to Unit.
 # Facade layer (GridSystem) casts to Unit when needed.
 
 func can_enter(_unit: Node) -> bool:
-	return not blocks_movement
+	return passable
 
 func get_movement_cost(_unit: Node) -> int:
 	return movement_cost

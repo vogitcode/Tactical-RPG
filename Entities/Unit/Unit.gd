@@ -204,6 +204,13 @@ func fire_hook(hook_id: StringName, ctx: PassiveContext) -> void:
 	for passive in _hook_index.get(hook_id, []):
 		(passive as BasePassive).handle_hook(hook_id, ctx)
 
+func can_traverse(tile: BaseTile) -> bool:
+	if tile == null:
+		return false
+	if tile.required_capability == &"":
+		return tile.passable
+	return _capabilities.has(tile.required_capability)
+
 func get_effective_move_points() -> int:
 	var ctx := MoveQueryContext.new()
 	ctx.unit = self

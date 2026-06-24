@@ -1,15 +1,11 @@
 class_name GridData
 extends RefCounted
 
-class CellData:
-	var tile: BaseTile = null
-	var elevation: int = 0
-	var occupant: Node = null  # Unit reference
-	var prop: Node = null      # Interactable object reference
-
 var width: int
 var height: int
-var _cells: Dictionary = {}  # Vector2i -> CellData
+var _tiles: Dictionary = {}  # Vector2i -> BaseTile
+var _units: Dictionary = {}  # Vector2i -> Node (Unit)
+var _props: Dictionary = {}  # Vector2i -> Node (Prop)
 
 func _init(cfg: GridConfig) -> void:
 	width = cfg.grid_width
@@ -19,80 +15,64 @@ func _init(cfg: GridConfig) -> void:
 func _fill_default() -> void:
 	for x in range(width):
 		for y in range(height):
-			var cell := CellData.new()
-			cell.tile = FloorTile.new()
-			_cells[Vector2i(x, y)] = cell
+			_tiles[Vector2i(x, y)] = FloorTile.new()
 
-# --- Query ---
+# --- Tile layer ---
 
 func is_valid(pos: Vector2i) -> bool:
 	return pos.x >= 0 and pos.x < width and pos.y >= 0 and pos.y < height
 
-func get_cell(pos: Vector2i) -> CellData:
-	return _cells.get(pos)
-
 func get_tile(pos: Vector2i) -> BaseTile:
-	var cell := get_cell(pos)
-	return cell.tile if cell else null
-
-## Unit-agnostic: blocks_movement + occupant check.
-func is_passable(pos: Vector2i) -> bool:
-	var cell := get_cell(pos)
-	return cell != null and not cell.tile.blocks_movement and cell.occupant == null
-
-## Unit-agnostic: blocks_movement only (ignores occupant).
-func is_passable_ignore_occupant(pos: Vector2i) -> bool:
-	var cell := get_cell(pos)
-	return cell != null and not cell.tile.blocks_movement
-
-## Unit-aware: delegates to tile.can_enter(unit) + occupant check.
-## Use this for movement range and pathfinding when the unit is known.
-func is_passable_for(pos: Vector2i, unit: Node) -> bool:
-	var cell := get_cell(pos)
-	return cell != null and cell.tile.can_enter(unit) and cell.occupant == null
-
-## Unit-aware: tile.can_enter(unit) only (ignores occupant).
-func is_passable_ignore_occupant_for(pos: Vector2i, unit: Node) -> bool:
-	var cell := get_cell(pos)
-	return cell != null and cell.tile.can_enter(unit)
-
-func get_occupant(pos: Vector2i) -> Node:
-	var cell := get_cell(pos)
-	return cell.occupant if cell else null
-
-# --- Mutation ---
+	return _tiles.get(pos)
 
 func set_tile(pos: Vector2i, tile: BaseTile) -> void:
-	var cell := get_cell(pos)
-	if cell:
-		cell.tile = tile
+	if is_valid(pos):
+		_tiles[pos] = tile
 
-func set_occupant(pos: Vector2i, unit: Node) -> void:
-	var cell := get_cell(pos)
-	if cell:
-		cell.occupant = unit
+## Tile-only check: is the terrain passable? Does NOT check unit occupancy.
+## Combined check (tile + occupant) lives in GridSystem.is_occupied() / _build_traversal_override().
+func is_passable_tile(pos: Vector2i) -> bool:
+	var tile := _tiles.get(pos) as BaseTile
+	return tile != null and tile.passable
 
-func clear_occupant(pos: Vector2i) -> void:
-	var cell := get_cell(pos)
-	if cell:
-		cell.occupant = null
+## All valid tile positions — used by TileProcessor for round-start spread iteration.
+func get_all_tile_positions() -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	result.assign(_tiles.keys())
+	return result
 
-func move_occupant(from: Vector2i, to: Vector2i) -> void:
-	var unit := get_occupant(from)
-	clear_occupant(from)
-	set_occupant(to, unit)
-
-func set_prop(pos: Vector2i, prop: Node) -> void:
-	var cell := get_cell(pos)
-	if cell:
-		cell.prop = prop
-
-# --- Bulk helpers ---
-
-## Returns all cell positions matching a predicate: func(cell: CellData) -> bool
+## Returns all tile positions matching a predicate: func(tile: BaseTile) -> bool
 func get_all_cells_where(predicate: Callable) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
-	for pos in _cells:
-		if predicate.call(_cells[pos]):
+	for pos in _tiles:
+		if predicate.call(_tiles[pos]):
 			result.append(pos)
 	return result
+
+# --- Unit occupancy layer ---
+
+func get_occupant(pos: Vector2i) -> Node:
+	return _units.get(pos)
+
+func set_occupant(pos: Vector2i, unit: Node) -> void:
+	_units[pos] = unit
+
+func clear_occupant(pos: Vector2i) -> void:
+	_units.erase(pos)
+
+func move_occupant(from: Vector2i, to: Vector2i) -> void:
+	var unit:Node = _units.get(from)
+	_units.erase(from)
+	if unit != null:
+		_units[to] = unit
+
+# --- Prop layer ---
+
+func get_prop(pos: Vector2i) -> Node:
+	return _props.get(pos)
+
+func set_prop(pos: Vector2i, prop: Node) -> void:
+	_props[pos] = prop
+
+func clear_prop(pos: Vector2i) -> void:
+	_props.erase(pos)

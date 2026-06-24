@@ -28,13 +28,13 @@ static func get_reachable_cells(
 			if passable_override.is_valid():
 				passable = passable_override.call(neighbor)
 			else:
-				passable = grid.is_passable(neighbor)
+				passable = grid.is_passable_tile(neighbor)
 			if not passable:
 				continue
 			var tile_cost := 1
-			var neighbor_cell := grid.get_cell(neighbor)
-			if neighbor_cell and neighbor_cell.tile:
-				tile_cost = neighbor_cell.tile.movement_cost
+			var neighbor_tile := grid.get_tile(neighbor)
+			if neighbor_tile:
+				tile_cost = neighbor_tile.movement_cost
 			var new_cost: int = cost + tile_cost
 			if new_cost <= move_points and (not visited.has(neighbor) or visited[neighbor] > new_cost):
 				visited[neighbor] = new_cost
@@ -82,13 +82,13 @@ static func find_path(
 			if passable_override.is_valid():
 				passable = passable_override.call(neighbor)
 			else:
-				passable = grid.is_passable_for(neighbor, unit) if unit != null else grid.is_passable(neighbor)
+				passable = grid.is_passable_tile(neighbor)
 			if not passable and neighbor != to:
 				continue
 			var tile_cost := 1
-			var neighbor_cell := grid.get_cell(neighbor)
-			if neighbor_cell and neighbor_cell.tile:
-				tile_cost = neighbor_cell.tile.get_pathfinding_cost(unit) if unit != null else neighbor_cell.tile.movement_cost
+			var neighbor_tile := grid.get_tile(neighbor)
+			if neighbor_tile:
+				tile_cost = neighbor_tile.get_pathfinding_cost(unit) if unit != null else neighbor_tile.movement_cost
 			var new_g: int = g + tile_cost
 			var new_f: int = new_g + _heuristic(neighbor, to)
 			open_set.append([new_f, new_g, neighbor, path + [pos]])
@@ -119,8 +119,8 @@ static func get_range_cells(
 static func has_line_of_sight(grid: GridData, from: Vector2i, to: Vector2i) -> bool:
 	var cells := _get_line_cells(from, to)
 	for i in range(1, cells.size() - 1):  # skip start and end
-		var cell := grid.get_cell(cells[i])
-		if cell == null or cell.tile == null or cell.tile.blocks_los:
+		var tile := grid.get_tile(cells[i])
+		if tile == null or tile.blocks_los:
 			return false
 	return true
 

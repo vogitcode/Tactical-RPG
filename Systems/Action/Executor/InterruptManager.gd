@@ -44,11 +44,11 @@ func start_watch(category: StringName, unit: Unit) -> WatchdogHandle:
 	var cfg: WatchdogConfig = _config_map.get(category, null)
 	if cfg == null:
 		return handle
+	var unit_name: String = unit.name
 	var timer := get_tree().create_timer(cfg.timeout_sec)
 	timer.timeout.connect(func() -> void:
 		if handle.is_completed():
 			return
-		var unit_name :StringName = unit.name if is_instance_valid(unit) else "?"
 		push_warning("[Watchdog] %.1fs timeout — category: %s, unit: %s" % [
 			cfg.timeout_sec, category, unit_name
 		])

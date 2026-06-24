@@ -61,6 +61,10 @@ func _on_hp_changed(_old_hp: int, _new_hp: int, unit: Unit) -> void:
 func unregister_unit(unit: Unit) -> void:
 	if not _displays.has(unit):
 		return
+	if unit.hp_changed.is_connected(_on_hp_changed.bind(unit)):
+		unit.hp_changed.disconnect(_on_hp_changed.bind(unit))
+	if unit.unit_died.is_connected(_on_unit_died.bind(unit)):
+		unit.unit_died.disconnect(_on_unit_died.bind(unit))
 	_displays[unit].root.queue_free()
 	_displays.erase(unit)
 

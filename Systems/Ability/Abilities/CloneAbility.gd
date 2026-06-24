@@ -31,16 +31,16 @@ func on_deselected(_unit: Unit, grid_system: GridSystem) -> void:
 	grid_system.clear_highlights()
 
 func resolve_target(grid_pos: Vector2i, source_unit: Unit, grid_system: GridSystem) -> bool:
-	var dx := abs(grid_pos.x - source_unit.grid_position.x)
-	var dy := abs(grid_pos.y - source_unit.grid_position.y)
-	var dist := dx + dy
+	var dx: int = abs(grid_pos.x - source_unit.grid_position.x)
+	var dy: int = abs(grid_pos.y - source_unit.grid_position.y)
+	var dist: int = dx + dy
 	if dist < 1 or dist > PLACEMENT_RANGE:
 		return false
 	if not grid_system.is_valid(grid_pos):
 		return false
 	if grid_system.get_occupant(grid_pos) != null:
 		return false
-	var tile := grid_system.get_tile(grid_pos)
+	var tile: BaseTile = grid_system.get_tile(grid_pos)
 	if tile == null or not tile.can_enter(source_unit):
 		return false
 	target_cell = grid_pos
@@ -60,7 +60,7 @@ func _get_valid_cells(unit: Unit, grid_system: GridSystem) -> Array[Vector2i]:
 	var origin := unit.grid_position
 	for dx in range(-PLACEMENT_RANGE, PLACEMENT_RANGE + 1):
 		for dy in range(-PLACEMENT_RANGE, PLACEMENT_RANGE + 1):
-			var dist := abs(dx) + abs(dy)
+			var dist: int = abs(dx) + abs(dy)
 			if dist < 1 or dist > PLACEMENT_RANGE:
 				continue
 			var pos := origin + Vector2i(dx, dy)
@@ -68,7 +68,7 @@ func _get_valid_cells(unit: Unit, grid_system: GridSystem) -> Array[Vector2i]:
 				continue
 			if grid_system.get_occupant(pos) != null:
 				continue
-			var tile := grid_system.get_tile(pos)
+			var tile: BaseTile = grid_system.get_tile(pos)
 			if tile != null and tile.can_enter(unit):
 				result.append(pos)
 	return result

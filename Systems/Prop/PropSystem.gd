@@ -9,9 +9,13 @@ signal prop_triggered(prop: BaseProp, unit: Unit, cell: Vector2i)
 signal prop_removed(cell: Vector2i)
 
 var _props: Dictionary = {}  # Vector2i -> BaseProp
+var _trap_abort_check: TrapAbortCheck = null
 
 func setup(grid_system: GridSystem) -> void:
 	grid_system.register_passable_check(has_blocking_prop)
+
+func set_trap_abort_check(check: TrapAbortCheck) -> void:
+	_trap_abort_check = check
 
 # --- Placement ---
 
@@ -33,7 +37,7 @@ func has_blocking_prop(cell: Vector2i) -> bool:
 	var prop: BaseProp = _props.get(cell)
 	if prop == null:
 		return false
-	return prop.blocks_movement and prop.active
+	return not prop.passable and prop.active
 
 # --- State mutations ---
 
@@ -59,9 +63,14 @@ func _on_unit_stepped(unit: Unit, cell: Vector2i) -> void:
 	if prop == null or not prop.active:
 		return
 
+	if unit.has_capability(&"trap_immunity"):
+		return
+
 	# SYNC phase — interrupt flag must be set before any await
 	var result: PropInteractionResult = prop.on_unit_enter(unit, cell)
 	if result.interrupts:
+		if _trap_abort_check != null:
+			_trap_abort_check.notify_triggered(unit)
 		prop_triggered.emit(prop, unit, cell)
 		if prop.one_shot:
 			remove_prop(cell)

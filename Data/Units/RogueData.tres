@@ -8,9 +8,9 @@
 [ext_resource type="Script" uid="uid://coi5uc1ftetq8" path="res://Systems/Action/Actions/EndTurnAction.gd" id="5"]
 [ext_resource type="Script" uid="uid://djce20wfimobh" path="res://Systems/Reaction/BaseReaction.gd" id="6"]
 [ext_resource type="Script" uid="uid://b86nueot48xir" path="res://Systems/Reaction/DodgeReaction.gd" id="7"]
-[ext_resource type="Script" path="res://Systems/Action/Actions/DashAttack.gd" id="8"]
+[ext_resource type="Script" uid="uid://cali7msupibdg" path="res://Systems/Action/Actions/DashAttack.gd" id="8"]
 [ext_resource type="Script" uid="uid://d2o8y3bfudic8" path="res://Systems/Passive/BasePassive.gd" id="9"]
-[ext_resource type="Script" path="res://Systems/Passive/Passives/TripleDashPassive.gd" id="10"]
+[ext_resource type="Script" uid="uid://cfup4h3s5q6nj" path="res://Systems/Passive/Passives/TripleDashPassive.gd" id="10"]
 
 [sub_resource type="Resource" id="Resource_1"]
 script = ExtResource("2")
@@ -18,22 +18,22 @@ script = ExtResource("2")
 [sub_resource type="Resource" id="Resource_2"]
 script = ExtResource("3")
 
+[sub_resource type="Resource" id="Resource_dash"]
+script = ExtResource("8")
+
 [sub_resource type="Resource" id="Resource_3"]
 script = ExtResource("4")
 
 [sub_resource type="Resource" id="Resource_4"]
 script = ExtResource("5")
 
-[sub_resource type="Resource" id="Resource_mmpcx"]
-script = ExtResource("7")
-base_rp = 6
-
-[sub_resource type="Resource" id="Resource_dash"]
-script = ExtResource("8")
-
-[sub_resource type="Resource" id="Resource_tripledash"]
+[sub_resource type="Resource" id="Resource_2ssyx"]
 script = ExtResource("10")
 passive_name = "Triple Dash"
+
+[sub_resource type="Resource" id="Resource_h0ext"]
+script = ExtResource("7")
+base_rp = 6
 
 [resource]
 script = ExtResource("1")
@@ -43,5 +43,6 @@ move_points = 5
 attack_damage = 4
 atlas_cell = Vector2i(3, 0)
 actions = Array[ExtResource("1_p1usx")]([SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_dash"), SubResource("Resource_3"), SubResource("Resource_4")])
-reactions = Array[ExtResource("6")]([SubResource("Resource_mmpcx")])
-passives = Array[ExtResource("9")]([SubResource("Resource_tripledash")])
+reactions = Array[ExtResource("6")]([SubResource("Resource_h0ext")])
+passives = Array[ExtResource("9")]([SubResource("Resource_2ssyx")])
+initial_capabilities = Array[StringName]([&"trap_immunity"])

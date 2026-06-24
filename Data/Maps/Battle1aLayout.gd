@@ -1,7 +1,7 @@
 ## Tutorial battle 1a — "First Contact".
 ## Two player units vs two enemies, open field with wall cover.
 ## Purpose: teach movement, attack, basic positioning.
-## No zones or props — pure combat tutorial.
+## Props: one pressure trap at (5,3) to test TrapAbortCheck.
 class_name Battle1aLayout
 extends RefCounted
 
@@ -9,6 +9,7 @@ static func build() -> MapData:
 	var data := MapData.new()
 	_add_tiles(data)
 	_add_units(data)
+	_add_props(data)
 	return data
 
 static func _add_tiles(data: MapData) -> void:
@@ -26,6 +27,14 @@ static func _add_tiles(data: MapData) -> void:
 	for pos: Vector2i in [Vector2i(5, 4), Vector2i(6, 4),
 			Vector2i(5, 5), Vector2i(6, 5)]:
 		data.tiles[pos] = GrassTile.new()
+
+static func _add_props(data: MapData) -> void:
+	# Pressure trap on the center path — unit walking through takes 3 damage + move interrupted
+	data.prop_placements.append({
+		"prop": TrapProp.new(),
+		"cell": Vector2i(5, 3),
+		"highlight": true,
+	})
 
 static func _add_units(data: MapData) -> void:
 	data.unit_placements.append({
