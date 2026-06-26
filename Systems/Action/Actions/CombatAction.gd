@@ -1,6 +1,6 @@
 ## Abstract base for all combat actions — attack, ability, item use, etc.
-## Carries target data and effect arrays that EffectExecutor runs.
-## Subclasses declare specific effects in _init(); system executes them.
+## Carries target data and command arrays that CombatCommandExecutor runs.
+## Subclasses declare specific commands in _init(); system executes them.
 class_name CombatAction
 extends BaseAction
 
@@ -9,11 +9,11 @@ var target_unit: Unit = null
 ## "deterministic" (default) or "probabilistic" — opt-in via item/passive/mechanic.
 var check_type: StringName = &"deterministic"
 
-## Effect pipeline — populated in subclass _init(). Not @export so _init() values are used.
-var pre_effects: Array[BaseEffect] = []
-var on_hit_effects: Array[BaseEffect] = []
-var on_miss_effects: Array[BaseEffect] = []
-var post_effects: Array[BaseEffect] = []
+## Command pipeline — populated in subclass _init(). Not @export so _init() values are used.
+var pre_commands: Array[BaseCommand] = []
+var on_hit_commands: Array[BaseCommand] = []
+var on_miss_commands: Array[BaseCommand] = []
+var post_commands: Array[BaseCommand] = []
 
 func _init() -> void:
 	target_mode = TargetMode.UNIT

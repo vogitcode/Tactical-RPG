@@ -1,5 +1,5 @@
 ## Context for the &"on_before_deal_damage" hook.
-## Fired inside DamageEffect.execute_async() before target.take_damage() is called.
+## Fired inside DamageCommand.execute_async() before target.take_damage() is called.
 ## Passives on the ATTACKER (source_unit) may modify damage upward or downward.
 class_name DealDamageContext
 extends PassiveContext

@@ -20,7 +20,7 @@ signal state_changed(new_state: BattleState)
 signal battle_started()
 signal turn_started(turn_number: int)
 signal faction_turn_started(faction_id: int)
-signal unit_turn_started(unit: Unit)
+signal unit_turn_started(unit: Unit, is_deferred: bool)
 signal unit_turn_ended(unit: Unit)
 signal faction_turn_ended(faction_id: int)
 signal turn_ended(turn_number: int)
@@ -204,7 +204,7 @@ func go_to_unit_turn(unit: Unit) -> void:
 		" (deferred)" if is_deferred else ""
 	])
 	_set_state(BattleState.UNIT_TURN_START)
-	unit_turn_started.emit(unit)
+	unit_turn_started.emit(unit, is_deferred)
 	await transition_to(unit_turn_start_state, {"unit": unit})
 
 func go_to_unit_acting(unit: Unit) -> void:

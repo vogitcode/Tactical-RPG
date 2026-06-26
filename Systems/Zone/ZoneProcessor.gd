@@ -74,7 +74,9 @@ func _on_unit_stepped(unit: Unit, cell: Vector2i) -> void:
 
 ## Called at the start of each unit's turn (TurnSystem.unit_turn_started).
 ## Fires "on_turn_start" for the zone on the unit's current cell.
-func _on_unit_turn_started(unit: Unit) -> void:
+func _on_unit_turn_started(unit: Unit, is_deferred: bool) -> void:
+	if is_deferred:
+		return
 	var zone := get_zone_at(unit.grid_position)
 	if zone == null or not &"on_turn_start" in zone.triggers:
 		return
@@ -100,10 +102,10 @@ func _on_unit_died(unit: Unit) -> void:
 # --- Internal ---
 
 func _apply_zone_effect(zone: ZoneData, unit: Unit, cell: Vector2i) -> void:
-	if zone.default_effect == null or not unit.is_alive():
+	if zone.default_command == null or not unit.is_alive():
 		return
 	var ctx := ActionContext.new()
 	ctx.target_unit = unit
 	ctx.target_cell = cell
 	ctx.grid_system = _grid_system
-	zone.default_effect.execute_async(ctx)
+	zone.default_command.execute_async(ctx)

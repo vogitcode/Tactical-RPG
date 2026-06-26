@@ -85,7 +85,7 @@ func _on_passive_hovered(passive: BasePassive) -> void:
 		text += "\n\n" + passive.description
 	_tooltip.show_description(text)
 
-func _on_unit_turn_started_for_hud(_unit: Unit) -> void:
+func _on_unit_turn_started_for_hud(_unit: Unit, _is_deferred: bool) -> void:
 	_turn_order_panel.update_order(system_manager.unit_manager.get_living_units())
 
 func _on_unit_turn_finished_for_hud(_unit: Unit) -> void:
@@ -101,7 +101,7 @@ func _on_battle_ended_hud(_result: StringName) -> void:
 func _on_turn_started(turn_number: int) -> void:
 	_status_label.text = "— Round %d —" % turn_number
 
-func _on_unit_turn_started(unit: Unit) -> void:
+func _on_unit_turn_started(unit: Unit, _is_deferred: bool) -> void:
 	var team_str := "Player" if unit.team == 0 else "Enemy"
 	_status_label.text = "Round %d  |  %s: %s  HP:%d/%d  AP:%d" % [
 		system_manager.turn_system.current_turn, team_str, unit.unit_name,

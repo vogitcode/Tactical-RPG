@@ -2,7 +2,7 @@
 ##
 ## Accepts CombatAction submissions, queues them, and drains sequentially.
 ## Child nodes hold each processing step:
-##   ReactionCollector → Arbitrator → EffectExecutor → PassiveScanner
+##   ReactionCollector → Arbitrator → CombatCommandExecutor → BattleResultHandler
 ##
 ## Queue management (_queue, _drain, _is_running, sequence_done) is internal.
 class_name CombatSystem
@@ -10,10 +10,10 @@ extends Node
 
 signal sequence_done
 
-@onready var _reaction_collector: ReactionCollector = $ReactionCollector
-@onready var _arbitrator: Arbitrator                 = $Arbitrator
-@onready var _effect_executor: EffectExecutor        = $EffectExecutor
-@onready var _passive_scanner: PassiveScanner        = $PassiveScanner
+@onready var _reaction_collector: ReactionCollector     = $ReactionCollector
+@onready var _arbitrator: Arbitrator                    = $Arbitrator
+@onready var _command_executor: CombatCommandExecutor    = $CombatCommandExecutor
+@onready var _battle_result_handler: BattleResultHandler = $BattleResultHandler
 
 var _grid_system: GridSystem = null
 var _interrupt_manager: InterruptManager = null
@@ -59,7 +59,7 @@ func _drain() -> void:
 		if _last_result.is_interrupted():
 			_queue.clear()
 			break
-		_passive_scanner.scan(process)
+		_battle_result_handler.scan(process)
 	_is_running = false
 	sequence_done.emit()
 
@@ -72,7 +72,7 @@ func _run_process(process: BattleProcess) -> ActionResult:
 		await process.reaction.execute_async(process.reactor_unit)
 	if _check_abort(process.source_unit):
 		return ActionResult.interrupted("combat_abort")
-	return await _effect_executor.execute(process.action, process.source_unit, condition, _grid_system)
+	return await _command_executor.execute(process.action, process.source_unit, condition, _grid_system)
 
 func _check_abort(unit: Unit) -> bool:
 	if _interrupt_manager == null:

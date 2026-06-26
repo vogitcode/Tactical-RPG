@@ -82,7 +82,9 @@ func _on_unit_stepped(unit: Unit, cell: Vector2i) -> void:
 	if prop.one_shot:
 		remove_prop(cell)
 
-func _on_unit_turn_started(unit: Unit) -> void:
+func _on_unit_turn_started(unit: Unit, is_deferred: bool) -> void:
+	if is_deferred:
+		return
 	var cell: Vector2i = unit.grid_position
 	var prop: BaseProp = _props.get(cell)
 	if prop == null or not prop.active:

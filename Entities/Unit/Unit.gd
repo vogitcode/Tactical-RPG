@@ -41,7 +41,8 @@ func _ready() -> void:
 	_status_receiver = StatusEffectReceiver.new()
 	add_child(_status_receiver)
 	if unit_data != null:
-		_runtime_passives.assign(unit_data.passives)
+		for passive in unit_data.passives:
+			_runtime_passives.append(passive.duplicate())
 	_rebuild_hook_index()
 	for passive in _runtime_passives:
 		var ctx := AttachContext.new()

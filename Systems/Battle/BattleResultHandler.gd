@@ -1,7 +1,7 @@
 ## Fires the HookId.ON_COMBAT_RESOLVED hook on both combatants after each BattleProcess.
 ## Lives as a child Node of CombatSystem; called from _drain() after _run_process().
 ## Future: may also enqueue counter-attack BattleProcesses here.
-class_name PassiveScanner
+class_name BattleResultHandler
 extends Node
 
 ## Call after _run_process() completes. process.condition_result must be set.

@@ -1,6 +1,6 @@
 ## Visual layer for props — renders a TileMapLayer on top of tile graphics.
 ## One TileMapLayer per PropVisualizer; source 0 = Prop 32x32.png.
-## Attach as a child Node2D of GridVisualizer so coordinate spaces match.
+## Sibling of GridVisualizer under GridSystem — same world origin, aligned coordinate space.
 class_name PropVisualizer
 extends Node2D
 

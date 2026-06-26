@@ -12,7 +12,7 @@ func _init() -> void:
 	ap_cost = 1
 	base_rp = 10
 	_sets_has_acted = true
-	on_hit_effects.assign([DelayEffect.new(0.2), DamageEffect.new()])
+	on_hit_commands.assign([DelayCommand.new(0.2), DamageCommand.new()])
 
 func can_execute(unit: Unit) -> bool:
 	if not super(unit):

@@ -4,12 +4,11 @@ class_name TileRequest
 extends RefCounted
 
 
-## Request to apply a gameplay effect to a unit standing on or entering the tile.
-class TileEffectRequest extends TileRequest:
+## Request to execute a command on a unit standing on or entering the tile.
+## The tile sets target + command; TileProcessor builds TileContext and invokes.
+class TileCommandRequest extends TileRequest:
 	var target: Node          # Unit
-	var effect_type: StringName  # &"damage", &"heal", &"apply_status"
-	var amount: int = 0
-	var status_id: StringName = &""
+	var command: BaseCommand  # what to execute on target
 
 
 ## Request to replace a tile with a different type (e.g. WaterTile → IceTile).

@@ -14,7 +14,7 @@ var _adapter: TopDownGridAdapter
 var _extra_passable_checks: Array[Callable] = []
 
 @onready var visualizer: GridVisualizer = $GridVisualizer
-@onready var prop_visualizer: PropVisualizer = $GridVisualizer/PropVisualizer
+@onready var prop_visualizer: PropVisualizer = $PropVisualizer
 
 func _ready() -> void:
 	if config == null:
@@ -42,19 +42,9 @@ func place_unit(unit: Unit, pos: Vector2i) -> void:
 
 func move_unit(unit: Unit, to: Vector2i) -> void:
 	var from: Vector2i = unit.grid_position
-	var from_tile := data.get_tile(from)
-	var to_tile := data.get_tile(to)
-
-	if from_tile:
-		from_tile.on_unit_exit(unit, from)
-
 	data.move_occupant(from, to)
 	_position_unit_on_grid(unit, to)
 	unit.set_grid_position(to)
-
-	if to_tile:
-		to_tile.on_unit_enter(unit, to)
-
 	unit_moved.emit(unit, from, to)
 
 # --- Passable check registry (Option B — no GridData changes) ---
@@ -179,22 +169,12 @@ func get_cell_position(pos: Vector2i) -> Vector2:
 ## Fires tile exit/enter hooks and updates occupant data in one operation.
 ## Call once at the end of execute_move_async, never during traversal.
 func commit_unit_move(unit: Unit, origin: Vector2i, final_cell: Vector2i) -> void:
-	var from_tile := data.get_tile(origin)
-	var to_tile := data.get_tile(final_cell)
-	if from_tile:
-		from_tile.on_unit_exit(unit, origin)
 	data.move_occupant(origin, final_cell)
 	unit.set_grid_position(final_cell)
-	if to_tile:
-		to_tile.on_unit_enter(unit, final_cell)
 	unit_moved.emit(unit, origin, final_cell)
 
 # --- Turn hook callbacks (called by TurnSystem via SystemManager wiring) ---
 
-func fire_unit_turn_start(unit: Unit) -> void:
-	var tile := data.get_tile(unit.grid_position)
-	if tile:
-		tile.on_turn_start(unit, unit.grid_position)
 
 # --- Input receivers (called by InputSystem via Demo wiring) ---
 

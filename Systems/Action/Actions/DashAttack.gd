@@ -12,8 +12,8 @@ func _init() -> void:
 	ap_cost = 1
 	base_rp = 10
 	_sets_has_acted = true
-	pre_effects.assign([DashMoveEffect.new()])
-	on_hit_effects.assign([DelayEffect.new(0.1), DamageEffect.new()])
+	pre_commands.assign([DashMoveCommand.new()])
+	on_hit_commands.assign([DelayCommand.new(0.1), DamageCommand.new()])
 
 func can_execute(unit: Unit) -> bool:
 	if not super(unit):

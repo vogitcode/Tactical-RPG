@@ -28,6 +28,7 @@ extends Node2D
 @onready var ai_system: AISystem                       = $AISystem
 @onready var zone_processor: ZoneProcessor             = $ZoneProcessor
 @onready var prop_system: PropSystem                   = $PropSystem
+@onready var tile_processor: TileProcessor             = $TileProcessor
 @onready var ability_system: AbilitySystem             = $ActionHolder/AbilitySystem
 
 # --- Public API (called by GameLoop) ---
@@ -101,6 +102,12 @@ func _wire_systems() -> void:
 		ctx.register(trap_check)
 	)
 
+	tile_processor.setup(grid_system)
+	_move_system.unit_stepped.connect(tile_processor._on_unit_stepped)
+	# unit_turn_started: zone → prop → tile (connection order = call order)
+	turn_system.unit_turn_started.connect(tile_processor._on_unit_turn_started)
+	turn_system.turn_started.connect(tile_processor._on_round_started)
+
 	input_system.tile_clicked.connect(grid_system.on_tile_clicked)
 	input_system.tile_hovered.connect(grid_system.on_tile_hovered)
 	input_system.action_hotkey_pressed.connect(action_system.handle_hotkey)
@@ -111,7 +118,6 @@ func _wire_systems() -> void:
 	turn_system.unit_acting_state.activated.connect(action_system.on_unit_acting)
 	action_system.unit_turn_finished.connect(turn_system.on_unit_turn_finished, CONNECT_DEFERRED)
 
-	turn_system.unit_turn_started.connect(grid_system.fire_unit_turn_start)
 	turn_system.unit_turn_started.connect(_on_unit_turn_started)
 	turn_system.unit_turn_ended.connect(_on_unit_turn_ended)
 
@@ -146,12 +152,12 @@ func _place_props(map_data: MapData) -> void:
 		var cell: Vector2i = entry["cell"]
 		prop_system.place_prop(prop, cell)
 		grid_system.prop_visualizer.place(cell, prop)
-		if entry.get("highlight", true):
+		if entry.get("highlight", false):
 			grid_system.visualizer.highlight_cells([cell], GridVisualizer.HighlightType.DANGER)
 
 # --- Display callbacks ---
 
-func _on_unit_turn_started(unit: Unit) -> void:
+func _on_unit_turn_started(unit: Unit, _is_deferred: bool) -> void:
 	grid_system.highlight_selected(unit.grid_position)
 
 func _on_unit_turn_ended(_unit: Unit) -> void:

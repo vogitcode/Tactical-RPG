@@ -47,7 +47,7 @@ func _wire_cross_boundary() -> void:
 func _on_turn_started(turn_number: int) -> void:
 	_status_label.text = "— Round %d —" % turn_number
 
-func _on_unit_turn_started(unit: Unit) -> void:
+func _on_unit_turn_started(unit: Unit, _is_deferred: bool) -> void:
 	var team_str := "Player" if unit.team == 0 else "Enemy"
 	_status_label.text = "Round %d  |  %s: %s  HP:%d/%d  AP:%d" % [
 		system_manager.turn_system.current_turn, team_str, unit.unit_name,

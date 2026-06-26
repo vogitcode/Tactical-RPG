@@ -7,7 +7,6 @@ class_name TileContexts
 class TileEnterContext extends RefCounted:
 	var unit: Node               # entering unit
 	var pos: Vector2i            # tile position
-	var neighbors: Array[TileNeighborInfo] = []
 
 
 ## Passed to BaseTile.on_turn_start().

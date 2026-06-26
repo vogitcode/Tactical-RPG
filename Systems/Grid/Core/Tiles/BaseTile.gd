@@ -19,6 +19,13 @@ extends Resource
 ## If non-empty, unit must have this capability to traverse. Checked by Unit.can_traverse().
 @export var required_capability: StringName = &""
 
+## Optimization flags — TileProcessor skips hook calls when false.
+## Subclasses set these to true in their class body to opt in.
+var reacts_to_unit_enter: bool = false
+var reacts_to_turn_start: bool = false
+var reacts_to_round_start: bool = false
+var reacts_to_external_effect: bool = false
+
 # --- Virtual interface ---
 # Unit params are typed as Node (not Unit) to keep the Core layer free of
 # Entity dependencies — GridData._units stores Node, GridSystem casts to Unit.
@@ -35,11 +42,14 @@ func get_movement_cost(_unit: Node) -> int:
 func get_pathfinding_cost(_unit: Node) -> int:
 	return movement_cost + hazard_cost
 
-func on_unit_enter(_unit: Node, _grid_pos: Vector2i) -> void:
-	pass
+func on_unit_enter(_ctx: TileContexts.TileEnterContext) -> Array[TileRequest]:
+	return []
 
-func on_unit_exit(_unit: Node, _grid_pos: Vector2i) -> void:
-	pass
+func on_turn_start(_ctx: TileContexts.TileTurnContext) -> Array[TileRequest]:
+	return []
 
-func on_turn_start(_unit: Node, _grid_pos: Vector2i) -> void:
-	pass
+func on_round_start(_ctx: TileContexts.TileRoundContext) -> Array[TileRequest]:
+	return []
+
+func on_external_effect(_type: StringName, _ctx: TileContexts.TileEffectContext) -> Array[TileRequest]:
+	return []

@@ -1,5 +1,5 @@
 ## Context for the ON_DASH_EXECUTED hook.
-## Fired inside DashMoveEffect after the unit physically dashes to its destination.
+## Fired inside DashMoveCommand after the unit physically dashes to its destination.
 class_name DashContext
 extends PassiveContext
 

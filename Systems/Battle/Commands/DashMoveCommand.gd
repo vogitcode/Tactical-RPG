@@ -4,31 +4,34 @@
 ##
 ## Upgrade path (external): call MoveSystem.execute_move_async() with a computed path,
 ## emitting unit_stepped per cell to trigger prop/zone reactions and "charge through" damage.
-class_name DashMoveEffect
-extends BaseEffect
+class_name DashMoveCommand
+extends BaseCommand
 
 const DASH_DURATION: float = 0.08
 
-func execute_async(ctx: ActionContext) -> void:
+func execute_async(_ctx: BaseContext) -> void:
+	var ctx := _ctx as ActionContext
+	if ctx == null or ctx.source_unit == null:
+		return
 	if ctx.target_cell == Vector2i(-1, -1):
 		return
 
-	var dest := _find_dash_dest(ctx.unit.grid_position, ctx.target_cell, ctx.grid_system)
+	var dest := _find_dash_dest(ctx.source_unit.grid_position, ctx.target_cell, ctx.grid_system)
 
-	if dest != ctx.unit.grid_position:
-		var start_pos := ctx.unit.position
-		ctx.grid_system.move_unit(ctx.unit, dest)
-		var end_pos := ctx.unit.position
-		ctx.unit.position = start_pos
+	if dest != ctx.source_unit.grid_position:
+		var start_pos := ctx.source_unit.position
+		ctx.grid_system.move_unit(ctx.source_unit, dest)
+		var end_pos := ctx.source_unit.position
+		ctx.source_unit.position = start_pos
 
-		var tween := ctx.unit.create_tween()
-		tween.tween_property(ctx.unit, "position", end_pos, DASH_DURATION)
+		var tween := ctx.source_unit.create_tween()
+		tween.tween_property(ctx.source_unit, "position", end_pos, DASH_DURATION)
 		await tween.finished
 
 	var dash_ctx := DashContext.new()
-	dash_ctx.unit = ctx.unit
+	dash_ctx.unit = ctx.source_unit
 	dash_ctx.target_unit = ctx.target_unit
-	ctx.unit.fire_hook(HookId.ON_DASH_EXECUTED, dash_ctx)
+	ctx.source_unit.fire_hook(HookId.ON_DASH_EXECUTED, dash_ctx)
 
 ## Returns the adjacent cell of [target] closest to [from].
 ## Falls back to [from] (no movement) if all adjacent cells are blocked.

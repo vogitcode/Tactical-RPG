@@ -10,16 +10,16 @@ func _init() -> void:
 	blocks_los = false
 	atlas_source_id = 2  # tileset 32x32.png
 	atlas_coords = Vector2i(0, 1)  # bottom-left = red
+	reacts_to_turn_start = true
 
-func on_unit_enter(unit: Node, _grid_pos: Vector2i) -> void:
-	_apply_fire(unit)
+func on_turn_start(ctx: TileContexts.TileTurnContext) -> Array[TileRequest]:
+	return _fire_requests(ctx.unit)
 
-func on_turn_start(unit: Node, _grid_pos: Vector2i) -> void:
-	_apply_fire(unit)
-
-func _apply_fire(node: Node) -> void:
+func _fire_requests(node: Node) -> Array[TileRequest]:
 	var unit := node as Unit
 	if unit == null or not unit.is_alive():
-		return
-	print("[FireTile] ", unit.unit_name, " bị apply burn effect")
-	unit.take_damage(fire_damage)
+		return []
+	var req := TileRequest.TileCommandRequest.new()
+	req.target = unit
+	req.command = FixedDamageCommand.new(fire_damage)
+	return [req]
