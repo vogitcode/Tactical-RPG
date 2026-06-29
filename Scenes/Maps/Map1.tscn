@@ -47,6 +47,7 @@
 [ext_resource type="Script" uid="uid://dbfrgjqeapcwk" path="res://UI/DescriptionTooltip.gd" id="ui_tip"]
 [ext_resource type="Script" uid="uid://dtsw5ob4yh46f" path="res://UI/TurnOrderPanel.gd" id="ui_turn"]
 [ext_resource type="Script" uid="uid://ykj7md603ya6" path="res://Systems/Zone/ZoneProcessor.gd" id="zp"]
+[ext_resource type="Script" path="res://Systems/Spawn/UnitSpawner.gd" id="unit_spawner"]
 
 [sub_resource type="Resource" id="Resource_1fkkg"]
 script = ExtResource("17_1fkkg")
@@ -180,6 +181,11 @@ script = ExtResource("ps")
 
 [node name="TileProcessor" type="Node" parent="SystemManager" unique_id=1500000001]
 script = ExtResource("tp")
+
+[node name="SpawnGroup" type="Node" parent="." unique_id=1100000001]
+
+[node name="UnitSpawner" type="Node" parent="SpawnGroup" unique_id=1100000002]
+script = ExtResource("unit_spawner")
 
 [node name="WorldUIManager" type="Node2D" parent="." unique_id=1901635415]
 

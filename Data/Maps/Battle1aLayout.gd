@@ -1,7 +1,7 @@
 ## Tutorial battle 1a — "First Contact".
 ## Two player units vs two enemies, open field with wall cover.
 ## Purpose: teach movement, attack, basic positioning.
-## Props: one pressure trap at (5,3) to test TrapAbortCheck.
+## Props: one pressure trap at (5,3) to test TrapInterruptCondition.
 class_name Battle1aLayout
 extends RefCounted
 

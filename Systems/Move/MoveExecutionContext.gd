@@ -3,13 +3,13 @@ extends RefCounted
 
 ## Per-execution contract for move interrupt sources.
 ## Created fresh each handle_action call — no state leaks between executions.
-## Compositor registers AbortCheck instances here; MoveSystem polls evaluate() at each step.
+## Compositor registers MoveInterruptCondition instances here; MoveSystem polls evaluate() at each step.
 
-var _checks: Array[AbortCheck] = []
+var _checks: Array[MoveInterruptCondition] = []
 var _interrupt_reason: String = ""
 var _forced: bool = false
 
-func register(check: AbortCheck) -> void:
+func register(check: MoveInterruptCondition) -> void:
 	_checks.append(check)
 
 ## Called by watchdog timeout — bypasses registered checks, marks abort immediately.

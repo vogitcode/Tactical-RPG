@@ -5,6 +5,7 @@ class_name Map1
 extends Node
 
 @onready var system_manager: SystemManager         = $SystemManager
+@onready var _unit_spawner: UnitSpawner            = $SpawnGroup/UnitSpawner
 @onready var _health_ui_manager: HealthUIManager   = $WorldUIManager/HealthUIManager
 @onready var _status_label: Label                  = $UI/StatusLabel
 @onready var _stats_panel: UnitStatsPanel          = $UI/UnitStatsPanel
@@ -13,6 +14,7 @@ extends Node
 @onready var _tooltip: DescriptionTooltip          = $UI/DescriptionTooltip
 
 func _ready() -> void:
+	system_manager.set_spawner(_unit_spawner)
 	system_manager.initialize()
 	_wire_cross_boundary()
 	system_manager.load_map_data(Battle1aLayout.build())

@@ -38,6 +38,7 @@
 [ext_resource type="Script" path="res://Systems/Prop/PropSystem.gd" id="ps"]
 [ext_resource type="Script" path="res://Systems/Grid/TileProcessor.gd" id="tp"]
 [ext_resource type="Script" path="res://Systems/Ability/AbilitySystem.gd" id="ability_sys"]
+[ext_resource type="Script" path="res://Systems/Spawn/UnitSpawner.gd" id="unit_spawner"]
 [ext_resource type="Script" uid="uid://c53h6q12kqfo6" path="res://Systems/Action/Interaction/PlayerInteractionStateMachine.gd" id="pism"]
 [ext_resource type="Script" uid="uid://bojsfptbo2003" path="res://Systems/Action/Interaction/States/IdleInteractionState.gd" id="idle_is"]
 [ext_resource type="Script" uid="uid://df5van5pqrj78" path="res://Systems/Action/Interaction/States/MenuOpenInteractionState.gd" id="menu_is"]
@@ -173,6 +174,11 @@ script = ExtResource("ps")
 
 [node name="TileProcessor" type="Node" parent="SystemManager" unique_id=800000001]
 script = ExtResource("tp")
+
+[node name="SpawnGroup" type="Node" parent="." unique_id=900000001]
+
+[node name="UnitSpawner" type="Node" parent="SpawnGroup" unique_id=900000002]
+script = ExtResource("unit_spawner")
 
 [node name="WorldUIManager" type="Node2D" parent="." unique_id=200000009]
 

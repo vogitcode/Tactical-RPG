@@ -5,11 +5,11 @@ class_name MoveSystem
 extends Node
 
 ## Emitted after each step tween completes. Subscribers (PropSystem, ReactionSystem, tile hooks)
-## can register AbortCheck instances via move_execution_started to interrupt movement.
+## can register MoveInterruptCondition instances via move_execution_started to interrupt movement.
 signal unit_stepped(unit: Unit, cell: Vector2i)
 
 ## Emitted once per handle_action call, before execution begins.
-## Compositor connects this to register AbortCheck instances into the context.
+## Compositor connects this to register MoveInterruptCondition instances into the context.
 signal move_execution_started(ctx: MoveExecutionContext)
 
 const MOVE_DURATION: float = 0.15

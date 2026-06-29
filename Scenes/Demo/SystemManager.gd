@@ -31,7 +31,13 @@ extends Node2D
 @onready var tile_processor: TileProcessor             = $TileProcessor
 @onready var ability_system: AbilitySystem             = $ActionHolder/AbilitySystem
 
+var _unit_spawner: UnitSpawner
+
 # --- Public API (called by GameLoop) ---
+
+## Inject the UnitSpawner from SpawnGroup. Must be called before initialize().
+func set_spawner(spawner: UnitSpawner) -> void:
+	_unit_spawner = spawner
 
 ## Phase 1 — wire all gameplay systems together.
 ## Call before load_map_data().
@@ -62,7 +68,9 @@ func _spawn_units(map_data: MapData) -> void:
 		var unit_data: UnitData = entry["unit_data"]
 		var cell: Vector2i = entry["cell"]
 		var team: int = entry["team"]
-		var unit := unit_manager.spawn_unit(unit_data, team)
+		var unit := _unit_spawner.create_unit(unit_data, team)
+		unit_manager.adopt(unit)
+		_unit_spawner.configure_visuals(unit, unit_data)
 		grid_system.place_unit(unit, cell)
 
 # --- Internal system wiring ---
@@ -75,7 +83,7 @@ func _wire_systems() -> void:
 	action_system.register_handler(&"move", _move_system)
 	action_system.register_handler(&"combat", _combat_system)
 	action_system.register_handler(&"turn_control", turn_system)
-	ability_system.setup(grid_system, unit_manager, turn_system)
+	ability_system.setup(grid_system, unit_manager, turn_system, prop_system, _unit_spawner)
 	action_system.register_handler(&"ability", ability_system)
 	reaction_system.setup(_interrupt_manager, grid_system, action_system)
 	_move_system.unit_stepped.connect(reaction_system.evaluate_step)
@@ -93,14 +101,10 @@ func _wire_systems() -> void:
 	_move_system.unit_stepped.connect(prop_system._on_unit_stepped)
 	turn_system.unit_turn_started.connect(prop_system._on_unit_turn_started)
 	unit_manager.unit_died.connect(prop_system._on_unit_died)
+	prop_system.prop_placed.connect(grid_system.prop_visualizer.place)
 	prop_system.prop_removed.connect(grid_system.prop_visualizer.remove_at)
 
-	var trap_check := TrapAbortCheck.new()
-	prop_system.set_trap_abort_check(trap_check)
-	_move_system.move_execution_started.connect(func(ctx: MoveExecutionContext) -> void:
-		trap_check.reset()
-		ctx.register(trap_check)
-	)
+	_move_system.move_execution_started.connect(prop_system._on_move_execution_started)
 
 	tile_processor.setup(grid_system)
 	_move_system.unit_stepped.connect(tile_processor._on_unit_stepped)
@@ -151,7 +155,6 @@ func _place_props(map_data: MapData) -> void:
 		var prop: BaseProp = entry["prop"]
 		var cell: Vector2i = entry["cell"]
 		prop_system.place_prop(prop, cell)
-		grid_system.prop_visualizer.place(cell, prop)
 		if entry.get("highlight", false):
 			grid_system.visualizer.highlight_cells([cell], GridVisualizer.HighlightType.DANGER)
 

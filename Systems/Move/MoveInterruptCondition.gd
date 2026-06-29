@@ -1,8 +1,8 @@
-class_name AbortCheck
+class_name MoveInterruptCondition
 extends RefCounted
 
-## Port interface for move interrupt sources.
-## Concrete implementations (TrapAbortCheck, TileAbortCheck) registered into
+## Contract interface for move interrupt sources.
+## Concrete implementations (TrapInterruptCondition, TileInterruptCondition) registered into
 ## MoveExecutionContext by the compositor — MoveSystem never references them directly.
 
 func should_abort(unit: Unit) -> bool:

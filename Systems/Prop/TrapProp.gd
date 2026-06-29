@@ -12,8 +12,6 @@ func _init() -> void:
 	atlas_coords = Vector2i(0, 0)
 
 func on_unit_enter(unit: Node, _cell: Vector2i) -> PropInteractionResult:
-	var u := unit as Unit
-	if u == null:
+	if unit as Unit == null:
 		return PropInteractionResult.none()
-	u.take_damage(trap_damage)
-	return PropInteractionResult.interrupt()
+	return PropInteractionResult.interrupt_with(FixedDamageCommand.new(trap_damage))

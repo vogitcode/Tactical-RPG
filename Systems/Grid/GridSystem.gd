@@ -12,6 +12,7 @@ signal unit_moved(unit: Unit, from: Vector2i, to: Vector2i)
 var data: GridData
 var _adapter: TopDownGridAdapter
 var _extra_passable_checks: Array[Callable] = []
+var _prop_query: Callable = Callable()
 
 @onready var visualizer: GridVisualizer = $GridVisualizer
 @onready var prop_visualizer: PropVisualizer = $PropVisualizer
@@ -53,6 +54,16 @@ func move_unit(unit: Unit, to: Vector2i) -> void:
 ## Returns true if pos is BLOCKED by that condition.
 func register_passable_check(check: Callable) -> void:
 	_extra_passable_checks.append(check)
+
+## Register a prop existence query: func(pos: Vector2i) -> bool
+## Returns true if pos has a prop. Only one system (PropSystem) should register.
+func register_prop_query(query: Callable) -> void:
+	_prop_query = query
+
+func is_prop_at(pos: Vector2i) -> bool:
+	if _prop_query.is_valid():
+		return _prop_query.call(pos)
+	return false
 
 ## Generic passable override — no unit, uses tile.passable + occupant.
 func _build_passable_override() -> Callable:

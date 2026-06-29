@@ -1,28 +1,19 @@
-## Player ability: spawn a clone of the caster on a nearby empty tile.
-## Clone inherits the same unit_data (stats + actions + passives) and matches caster's current HP.
-## Costs all AP — caster cannot act again after cloning.
-class_name CloneAbility
+## Player ability: place a trap on an adjacent tile.
+## Any unit stepping on the cell takes damage and has movement interrupted.
+class_name SetTrapAbility
 extends BaseAbility
 
-const PLACEMENT_RANGE: int = 2
+const PLACEMENT_RANGE: int = 1
 
 var target_cell: Vector2i = Vector2i(-1, -1)
 
 func _init() -> void:
-	action_id = &"clone"
-	action_name = "Clone"
-	action_description = "Triệu hồi bản sao tại ô trống lân cận (phạm vi 2). Bản sao có cùng stats và passives."
-	ap_cost = 2
-	_sets_has_acted = true
+	action_id = &"set_trap"
+	action_name = "Set Trap"
+	action_description = "Đặt bẫy tại ô lân cận. Unit bước vào sẽ chịu sát thương và bị dừng di chuyển."
+	ap_cost = 1
 	target_mode = TargetMode.TILE
 	category = &"ability"
-
-func can_execute(unit: Unit) -> bool:
-	if not super.can_execute(unit):
-		return false
-	if unit.unit_data == null:
-		return false
-	return true
 
 func on_selected(unit: Unit, grid_system: GridSystem) -> void:
 	grid_system.show_move_range(_get_valid_cells(unit, grid_system))
@@ -40,8 +31,10 @@ func resolve_target(grid_pos: Vector2i, source_unit: Unit, grid_system: GridSyst
 		return false
 	if grid_system.get_occupant(grid_pos) != null:
 		return false
+	if grid_system.is_prop_at(grid_pos):
+		return false
 	var tile: BaseTile = grid_system.get_tile(grid_pos)
-	if tile == null or not tile.can_enter(source_unit):
+	if tile == null or not tile.passable:
 		return false
 	target_cell = grid_pos
 	return true
@@ -53,18 +46,9 @@ func clear_target() -> void:
 	target_cell = Vector2i(-1, -1)
 
 func execute(ctx: AbilityExecutionContext) -> ActionResult:
-	var clone := ctx.unit_spawner.create_clone(ctx.source_unit.unit_data, ctx.source_unit.team, 1)
-	ctx.unit_manager.adopt_clone(clone)
-	ctx.unit_spawner.configure_visuals(clone, ctx.source_unit.unit_data)
-	ctx.grid_system.place_unit(clone, target_cell)
-	clone.current_hp = ctx.source_unit.current_hp
-	ctx.turn_system.add_unit(clone)
+	ctx.prop_system.place_prop(TrapProp.new(), target_cell)
 	ctx.source_unit.action_points -= ap_cost
-	ctx.source_unit.has_acted = true
 	return ActionResult.completed()
-
-func get_category() -> String:
-	return "ability"
 
 func _get_valid_cells(unit: Unit, grid_system: GridSystem) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
@@ -79,7 +63,9 @@ func _get_valid_cells(unit: Unit, grid_system: GridSystem) -> Array[Vector2i]:
 				continue
 			if grid_system.get_occupant(pos) != null:
 				continue
+			if grid_system.is_prop_at(pos):
+				continue
 			var tile: BaseTile = grid_system.get_tile(pos)
-			if tile != null and tile.can_enter(unit):
+			if tile != null and tile.passable:
 				result.append(pos)
 	return result

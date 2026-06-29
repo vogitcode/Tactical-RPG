@@ -12,11 +12,13 @@ class_name GameLoop
 extends Node
 
 @onready var system_manager: SystemManager            = $SystemManager
+@onready var _unit_spawner: UnitSpawner               = $SpawnGroup/UnitSpawner
 @onready var _health_ui_manager: HealthUIManager      = $WorldUIManager/HealthUIManager
 @onready var _action_menu: ActionMenu                 = $UI/ScreenUIManager/ActionMenu
 @onready var _status_label: Label                     = $UI/StatusLabel
 
 func _ready() -> void:
+	system_manager.set_spawner(_unit_spawner)
 	system_manager.initialize()
 	_wire_cross_boundary()
 	system_manager.start_battle()

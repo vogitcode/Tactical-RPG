@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://coi5uc1ftetq8" path="res://Systems/Action/Actions/EndTurnAction.gd" id="5"]
 [ext_resource type="Script" uid="uid://djce20wfimobh" path="res://Systems/Reaction/BaseReaction.gd" id="6"]
 [ext_resource type="Script" uid="uid://b86nueot48xir" path="res://Systems/Reaction/DodgeReaction.gd" id="7"]
+[ext_resource type="Script" uid="uid://dgkspjd6w2fg5" path="res://Systems/Ability/Abilities/SetTrapAbility.gd" id="7_2ssyx"]
 [ext_resource type="Script" uid="uid://cali7msupibdg" path="res://Systems/Action/Actions/DashAttack.gd" id="8"]
 [ext_resource type="Script" uid="uid://d2o8y3bfudic8" path="res://Systems/Passive/BasePassive.gd" id="9"]
 [ext_resource type="Script" uid="uid://cfup4h3s5q6nj" path="res://Systems/Passive/Passives/TripleDashPassive.gd" id="10"]
@@ -27,6 +28,9 @@ script = ExtResource("4")
 [sub_resource type="Resource" id="Resource_4"]
 script = ExtResource("5")
 
+[sub_resource type="Resource" id="Resource_euspo"]
+script = ExtResource("7_2ssyx")
+
 [sub_resource type="Resource" id="Resource_2ssyx"]
 script = ExtResource("10")
 passive_name = "Triple Dash"
@@ -42,7 +46,7 @@ max_hp = 15
 move_points = 5
 attack_damage = 4
 atlas_cell = Vector2i(3, 0)
-actions = Array[ExtResource("1_p1usx")]([SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_dash"), SubResource("Resource_3"), SubResource("Resource_4")])
+actions = Array[ExtResource("1_p1usx")]([SubResource("Resource_1"), SubResource("Resource_2"), SubResource("Resource_dash"), SubResource("Resource_3"), SubResource("Resource_4"), SubResource("Resource_euspo")])
 reactions = Array[ExtResource("6")]([SubResource("Resource_h0ext")])
 passives = Array[ExtResource("9")]([SubResource("Resource_2ssyx")])
 initial_capabilities = Array[StringName]([&"trap_immunity"])
